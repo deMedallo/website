@@ -9,9 +9,9 @@ define("DB_NAME", "demedallo");
 
 error_reporting(-1);
 ini_set('display_errors', 'on');
-setlocale(LC_TIME,"es_CO"); // Configurar Hora para Colombia
-setlocale(LC_TIME, 'es_CO.UTF-8'); // Configurar Hora para Colombia en UTF-8
-date_default_timezone_set('America/Bogota'); // Configurar Zona Horaria
+#setlocale(LC_TIME,"es_CO"); // Configurar Hora para Colombia
+#setlocale(LC_TIME, 'es_CO.UTF-8'); // Configurar Hora para Colombia en UTF-8
+#date_default_timezone_set('America/Bogota'); // Configurar Zona Horaria
 
 define('site_name', 'deMedallo.com - El mejor contenido al alcance de un clic!'); // Titulo X defecto de la aplicacion
 define('site_name_md', 'deMedallo.com'); // Titulo X defecto small

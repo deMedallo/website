@@ -1,5 +1,6 @@
 <?php 
 
+header('Content-Type: application/json');
 include('../_cms/autoload.php');
 
 $jsonFinal = new stdClass();
@@ -27,13 +28,13 @@ if(
 					$jsonFinal->error = false;
 					$jsonFinal->data = $userInfo->wallets->DM->balance;
 				}else{
-					$jsonFinal->data = 0;
+					$jsonFinal->data = "000";
 				}
 			}else{
-				$jsonFinal->data = 0;
+				$jsonFinal->data = "00";
 			}
 		}else{
-			$jsonFinal->data = 0;
+			$jsonFinal->data = "0";
 		}
 	}else{
 		$jsonFinal->data = "Token invalido.";
@@ -43,6 +44,5 @@ if(
 }
 
 #FINAL
-header('Content-Type: application/json');
 echo json_encode($jsonFinal, JSON_PRETTY_PRINT);
 return json_encode($jsonFinal, JSON_PRETTY_PRINT);
