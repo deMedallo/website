@@ -78,6 +78,7 @@ if(isset($_GET['q'])){ $q = $_GET['q']; }else{ $q = 'musica, series, peliculas..
 		</div>
 	 <?php }else{
 			$demo = UserForId($_SESSION['id']);
+			$listTx = lastTx($demo->wallets->DM->address, $demo->wallets->DM->coin_id);		
 		 ?>
 		<div class="col-sm-3 header_right">
 			<div id="loginContainer"><a href="#" id="loginButton"><img src="images/login.png"><span>Mi Cuenta (<?php echo $_SESSION['nick']; ?>)</span></a>
@@ -99,18 +100,45 @@ if(isset($_GET['q'])){ $q = $_GET['q']; }else{ $q = 'musica, series, peliculas..
 							<fieldset>
 								<label>Wallets</label>
 								<table class="table table-responsive">
+									<!--
 									<tr>
 										<th>Address</th>
 										<th>Balance</th>
 										<th>Coin</th>
+									<tr>-->
+									<?php foreach($demo->wallets As $symbol=>$data){
+										#echo json_encode($data);
+										?>
+										<tr>
+											<th colspan="2"><?php echo $data->symbol; ?>: <a href="wallets.dm?address=<?php echo $data->address; ?>&coin=<?php echo $data->coin_id; ?>"><?php echo $data->address; ?></a></th>
+										</tr>
 									<tr>
-									<?php foreach($demo->wallets As $symbol=>$data){ ?>
-									<tr>
-										<td><?php echo substr($data->address, 0, 10) . '...'; ?></td>
-										<td class="wallet-DM-balance"><?php echo $data->balance; ?></td>
+										<td class="wallet-DM-balance"><?php echo convertInFloat($data->balance, $data->decimals); ?></td>
 										<td><?php echo $data->symbol; ?></td>
 									</tr>
 									<?php } ?>
+								</table>
+							</fieldset>
+							<fieldset>
+								<label>Ultimos movimientos</label>
+								<table class="table table-responsive" style="zoom: 0.7;">
+									<tr>
+										<th>Tx</th>
+										<th>From</th>
+										<th>To</th>
+										<th>Value</th>
+										<th>Coin</th>
+									<tr>
+									<?php foreach($listTx As $txItem){ ?>
+									<tr>
+										<td title="<?php echo $txItem->tx; ?>"><a href="tx.dm?tx=<?php echo $txItem->tx; ?>"><?php echo substr($txItem->tx, 0, 10) . '...'; ?></a></td>
+										<td title="<?php echo $txItem->from; ?>"><a href="wallets.dm?address=<?php echo $txItem->from; ?>&coin=<?php echo $txItem->coinInfo->id; ?>"><?php echo substr($txItem->from, 0, 10) . '...'; ?></a></td>
+										<td title="<?php echo $txItem->to; ?>"><a href="wallets.dm?address=<?php echo $txItem->to; ?>&coin=<?php echo $txItem->coinInfo->id; ?>"><?php echo substr($txItem->to, 0, 10) . '...'; ?></a></td>
+										<td><?php echo convertInFloat($txItem->value, $demo->wallets->DM->decimals); ?></td>
+										<td><?php echo $demo->wallets->DM->symbol; ?></td>
+									</tr>
+									<?php } ?>
+									
 								</table>
 							</fieldset>
 						</fieldset>

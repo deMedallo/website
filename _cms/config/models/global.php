@@ -1,5 +1,19 @@
 <?php
 
+Class CoinInfo{
+	var $id = 0;
+	var $name = '';
+	var $symbol = '';
+	var $decimals = 0;
+	
+	function __construct($args=array()) {
+		if(isset($args['id'])){ $this->id = (int) $args['id']; }
+		if(isset($args['name'])){ $this->name = (string) $args['name']; }	
+		if(isset($args['symbol'])){ $this->symbol = (string) $args['symbol']; }	
+		if(isset($args['decimals'])){ $this->decimals = (int) $args['decimals']; }	
+	}
+}
+
 Class BalanceWallet{
 	var $coin_id = 0;
 	var $balance = 0;
@@ -49,3 +63,33 @@ Class UserInfo{
 		$this->wallets = loadWallets($this->id);
 	}
 }
+
+Class TransferInfo{
+	var $id = 0;
+	var $tx = '';
+	var $from = '';
+	var $to = '';
+	var $value = 0;
+	var $fee = 0;
+	var $data = '';
+	var $coin = '';
+	var $create = 0;
+	var $coinInfo = null;
+	
+	function __construct($args=array()) {
+		if(isset($args['id'])){ $this->id = (int) $args['id']; }
+		if(isset($args['tx'])){ $this->tx = (string) $args['tx']; }
+		if(isset($args['from'])){ $this->from = (string) $args['from']; }
+		if(isset($args['to'])){ $this->to = (string) $args['to']; }
+		if(isset($args['value'])){ $this->value = (float) $args['value']; }
+		if(isset($args['fee'])){ $this->fee = (float) $args['fee']; }
+		if(isset($args['data'])){ $this->data = (string) $args['data']; }
+		if(isset($args['create'])){ $this->create = (string) $args['create']; }
+		if(isset($args['coin'])){ $this->coin = (int) $args['coin']; }
+		$this->coinInfo = CoinForId($this->coin);		
+	}
+}
+
+
+
+

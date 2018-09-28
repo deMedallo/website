@@ -34,6 +34,7 @@ header('Access-Control-Allow-Origin: *'); // Control de acceso Permitir origen d
 define('TBL_USER', 'users'); // tabla de 
 define('TBL_COIN', 'coins'); // tabla de 
 define('TBL_WALLET', 'wallets'); // tabla de 
+define('TBL_TRANSACTION', 'transactions'); // tabla de 
 
 
 
@@ -137,6 +138,16 @@ function UserForId($userId){
 	return $userInfo;
 }
 
+# Cargar moneda por ID
+function CoinForId($coin_id){
+	$coinInfo = new CoinInfo();
+	$result = datosSQL("Select * from ".TBL_COIN." where id='{$coin_id}' ");
+	if(isset($result->error) && $result->error == false && isset($result->data[0])){
+		$coinInfo = new CoinInfo($result->data[0]);
+	}
+	return $coinInfo;
+}
+
 function loadWallets($userId){
 	$walletInfo = new stdClass();
 	$result = datosSQL("Select ".TBL_WALLET.".address as address, ".TBL_WALLET.".coin as coin_id, ".TBL_WALLET.".balance as balance, ".TBL_COIN.".name As name, ".TBL_COIN.".symbol As symbol, ".TBL_COIN.".decimals As decimals from ".TBL_WALLET." INNER JOIN ".TBL_COIN." ON ".TBL_COIN.".id = ".TBL_WALLET.".coin AND ".TBL_WALLET.".userid='{$userId}'");
@@ -148,6 +159,20 @@ function loadWallets($userId){
 	return $walletInfo;
 }
 
+function convertInFloat($balance, $decimals){
+	if($balance>0){ $float = ($balance / (10**$decimals)); }
+	else { $float = 0; }
+	return number_format($float,$decimals,'.','');
+}
+
+function loadWalletOne($address, $coin){
+	$walletInfo = new BalanceWallet();
+	$result = datosSQL("Select ".TBL_WALLET.".address as address, ".TBL_WALLET.".coin as coin_id, ".TBL_WALLET.".balance as balance, ".TBL_COIN.".name As name, ".TBL_COIN.".symbol As symbol, ".TBL_COIN.".decimals As decimals from ".TBL_WALLET." INNER JOIN ".TBL_COIN." ON ".TBL_WALLET.".coin='{$coin}' AND ".TBL_WALLET.".address='{$address}'");
+	if(isset($result->error) && $result->error == false && isset($result->data[0])){
+		$walletInfo = new BalanceWallet($result->data[0]);
+	}	
+	return $walletInfo;
+}
 
 
 #################### ------------------------------------- ------------------------------------- ####################
@@ -157,16 +182,62 @@ function checkSession(){
 	else{ return true; }
 }
 
+function createTX_DM(){
+	$reference = sha1(md5(time()));
+	$uniqid = (uniqid('1'.time()));
+	return '0x'.$reference.$uniqid;
+}
+
+function newTransaccionDM($from, $to, $value=0, $fee=0, $data=''){
+	$sendr = new stdClass();
+	$sendr->error = true;
+	$sendr->id = (int) 0;
+	$sendr->tx = (string) createTX_DM();
+	$sendr->from = (string) $from;
+	$sendr->to = (string) $to;
+	$sendr->value = (float) $value;
+	$sendr->fee = (float) $fee;
+	$sendr->data = (string) $data;
+						
+	$create = crearSQL("INSERT INTO ".TBL_TRANSACTION." ( `tx`, `from`, `to`, `value`, `fee`, `data`, `coin` ) VALUES (?,?,?,?,?,?,?)",array(
+		$sendr->tx
+		, $sendr->from
+		, $sendr->to
+		, $sendr->value
+		, $sendr->fee
+		, $sendr->data
+		, 1
+	));
+	
+	if(isset($create->error) && $create->error == false){
+		$sendr->error = false;
+		$sendr->id = $create->last_id;
+	}
+	return $sendr;
+}
 
 
+function lastTx($address, $coin_id=0, $limit=8, $order='DESC'){
+	$resultArray = array();
+	$result = datosSQL("Select * from ".TBL_TRANSACTION." where `from`='{$address}' AND `coin`='{$coin_id}' OR `to`='{$address}' AND `coin`='{$coin_id}' ORDER BY id {$order} LIMIT {$limit}");
+	if(isset($result->error) && $result->error == false && isset($result->data[0])){
+		foreach($result->data As $tx){
+			$resultArray[] = new TransferInfo($tx);
+		}
+	}
+	
+	return $resultArray;
+}
 
-
-
-
-
-
-
-
+function TransferForTx($tx){
+	$resultado = new TransferInfo();
+	$result = datosSQL("Select * from ".TBL_TRANSACTION." where `tx`='{$tx}'");
+	if(isset($result->error) && $result->error == false && isset($result->data[0])){
+		$resultado = new TransferInfo($result->data[0]);
+	}
+	
+	return $resultado;
+}
 
 
 

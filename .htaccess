@@ -1,4 +1,4 @@
 
 RewriteEngine on
 RewriteRule ^(.*).dm$ index.php?page=$1 [L,QSA]
-RewriteRule ^(.*).html$ $1.php
+#RewriteRule ^(.*).html$ $1.php
