@@ -43,7 +43,7 @@
 				</li>
 			</ul>
 			<hr>
-			<div class="real">
+			<div class="real row">
 				<div class="col-sm-6">
 					<ul class="service_grid">
 						<span class="fa-stack fa-lg fa-2x">

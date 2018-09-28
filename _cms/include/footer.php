@@ -1,3 +1,9 @@
+
+
+<footer class="container">
+	<p class="float-right"><a href="#">Back to top</a></p>
+	<p>Donations &middot; <a><b>ETH</b>: 0x0cb159875098ad4ee77b5c3d4f6de636c823235b</a> &middot; <a href="terms-and-conditions.dm">Terms</a></p>
+</footer>
 <div class="footer">
 	<div class="container">
 		<!--
@@ -12,19 +18,7 @@
 				</span>
 			</form>
 		</div>
-		-->
-		<div class="footer_top">
-			<h3>Donaciones</h3>
-			<form>
-				<span>
-					<!--<i><img src="images/mail.png" alt=""></i>-->
-					<i><b>ETH:</b></i>
-					0x0cb159875098ad4ee77b5c3d4f6de636c823235b
-					<div class="clearfix"> </div>
-				</span>
-			</form>
-		</div>
-		
+		-->		
 		<div class="footer_grids">
 			<div class="footer-grid">
 				<h4>Link Oficiales</h4>
@@ -47,11 +41,11 @@
 				
 				<a href="https://www.facebook.com/TiendadeMedallo/"> <i class="fa fa-facebook fa-2x"> </i> </a>
 				<a href="https://github.com/deMedallo/"> <i class="fa fa-github fa-2x"> </i> </a>
-		 	<div class="copy wow fadeInRight" data-wow-delay="0.4s">
-              <p>© 2014 deMedallo.com. Developed by <a href="#" target="_blank">FelipheGomez</a></p>
-	        </div>
+			<div class="copy wow fadeInRight" data-wow-delay="0.4s">
+			  <p>© 2014 deMedallo.com. Developed by <a href="#" target="_blank">FelipheGomez</a></p>
+			</div>
 		  </div>
 		  <div class="clearfix"> </div>
 	   </div>
-      </div>
-   </div>
+  </div>
+</div>

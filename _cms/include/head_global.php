@@ -1,43 +1,26 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="">
+<meta name="author" content="">
+<link rel="icon" href="favicon.ico">
 
 <title>deMedallo.com | Videos, Desacargas y mas!!</title>
+
+<!-- Bootstrap core CSS -->
+<link href="dist/bootstrap/4.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Custom styles for this template -->
+<link href="assets/carousel.css" rel="stylesheet">
+<!--<link href="assets/style.css" rel="stylesheet">-->
+<!-- Vue core JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<!-- Vue Axios JavaScript -->
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-
-
 <link href="https://vjs.zencdn.net/7.1.0/video-js.css" rel="stylesheet">
 <!-- If you'd like to support IE8 (for Video.js versions prior to v7) -->
-<script src="https://vjs.zencdn.net/ie8/ie8-version/videojs-ie8.min.js"></script>
+<!-- <script src="https://vjs.zencdn.net/ie8/ie8-version/videojs-ie8.min.js"></script> -->
+
   
-  
-  
-  
-
-<link href="css/bootstrap.css" rel='stylesheet' type='text/css' />
-
-
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<!-- Custom Theme files -->
-<link href="css/style.css" rel='stylesheet' type='text/css' />
-<!-- Custom Theme files -->
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
-<!--webfont-->
-<link href='//fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
-<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
-<script type="text/javascript" src="js/login.js"></script>
-<script src="js/jquery.easydropdown.js"></script>
-<!--Animation-->
-<script src="js/wow.min.js"></script>
-<link href="css/animate.css" rel='stylesheet' type='text/css' />
-
-    <!-- Vue core JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-    <!-- Vue Axios JavaScript -->
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-	
-<script>
-	new WOW().init();
-</script>
-
 <script type="text/javascript">
 function validateYouTubeUrl(url){
 	if (url != undefined || url != '') {
@@ -48,9 +31,7 @@ function validateYouTubeUrl(url){
 			// if need to change the url to embed url then use below line
 			return match[2];
 		}
-		else {
-			return null;
-		}
+		else { return null; }
 	}
 }
 
@@ -71,22 +52,24 @@ window.onload = function() {
 			}
 		}
 		
-		
 		<?php if(checkSession() == true){ ?>
-			var dmplayer = player.getState();
-			if(dmplayer == 'playing'){
-				axios.get('api/points', {
-					params: {
-						token: "<?php echo $_SESSION['token']; ?>"
-					}
-				})
-				.then(function (response) {
-					// console.log(response);
-					if(response.data.error == false){
-						jQuery(".wallet-DM-balance").html(response.data.data);
-					}
-				})
-				.catch(function (error) { console.log(error); });
+			if (typeof player != 'undefined'){
+				
+				var dmplayer = player.getState();
+				if(dmplayer == 'playing'){
+					axios.get('api/points', {
+						params: {
+							token: "<?php echo $_SESSION['token']; ?>"
+						}
+					})
+					.then(function (response) {
+						// console.log(response);
+						if(response.data.error == false){
+							jQuery(".wallet-DM-balance").html(response.data.data);
+						}
+					})
+					.catch(function (error) { console.log(error); });
+				}
 			}
 		<?php } ?>
 	}
