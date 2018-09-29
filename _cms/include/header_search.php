@@ -9,7 +9,7 @@ if(isset($_GET['q'])){ $q = $_GET['q']; }else{ $q = 'musica, series, peliculas..
 	<form class="" method="get" id="download" action="search.dm">
 		<input type="text"  name="q" id="q" value="<?php echo $q; ?>" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '<?php echo $q; ?>';}">
 		<div class="contact_btn">
-		   <label class="btn1 btn-2 btn-2g"><input type="submit" name="type" id="type" value="Buscar"></label>
+		   <label class="btn1 btn-2 btn-2g"><input class="btn btn-default btn-lg" type="submit" name="type" id="type" value="Buscar"></label>
 		</div>
 	</form>        		
 	<div class="clearfix"></div>

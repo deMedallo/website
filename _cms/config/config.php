@@ -1,23 +1,32 @@
 <?php
 
+/*
+	Administrador del Sitio
+	admin
+	admin@demedallo.com
+	W{5$khQ{,##mT8EH
+	0x4b9987ccafacb8d8fc08d22bbca797ba
+	Initial: 
+	631720000000000000000
+	
+	         
+*/
+
 include('models/global.php');
 
 define("DB_SERVER", "localhost");
-define("DB_USER", "root");
-define("DB_PASS", "");
-define("DB_NAME", "demedallo");
+define("DB_USER", "id7278274_feliphegomez");
+define("DB_PASS", "Celeste.0.Samael");
+define("DB_NAME", "id7278274_demedallo");
 
 error_reporting(-1);
 ini_set('display_errors', 'on');
 #setlocale(LC_TIME,"es_CO"); // Configurar Hora para Colombia
 #setlocale(LC_TIME, 'es_CO.UTF-8'); // Configurar Hora para Colombia en UTF-8
 #date_default_timezone_set('America/Bogota'); // Configurar Zona Horaria
-
 define('site_name', 'deMedallo.com - El mejor contenido al alcance de un clic!'); // Titulo X defecto de la aplicacion
 define('site_name_md', 'deMedallo.com'); // Titulo X defecto small
-
 define('folderSitio', '/demedallo/website'); // Ruta de la carpeta del Sitio
-
 define("SERVER_NAME", $_SERVER['SERVER_NAME']); // Definir nombre del servidor
 define("SERVER_HOST", $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME']); // Definir nombre del servidor con host -> ORGANIZAR -> $_SERVER['REQUEST_SCHEME'].
 #define('url_api', SERVER_HOST.folderAPI); // Definir url de la API
@@ -29,7 +38,6 @@ session_set_cookie_params(0, url_site);
 session_start(['cookie_lifetime' => 86400,'read_and_close'  => false,]); // 86400 -> 1 Dia /// Tiempo de expiracion de la sesion en el servidor // Lectura y Cierre de la sessio e servidor 
 header('Access-Control-Allow-Origin: *'); // Control de acceso Permitir origen de:
 
-
 ############### ---- DEFINIR TABLAS ---- ###############
 define('TBL_USER', 'users'); // tabla de 
 define('TBL_COIN', 'coins'); // tabla de 
@@ -37,10 +45,12 @@ define('TBL_WALLET', 'wallets'); // tabla de
 define('TBL_TRANSACTION', 'transactions'); // tabla de 
 
 
+### DEFINIR CUENTA PRINCIPAL
+define('admin_address', '0x4b9987ccafacb8d8fc08d22bbca797ba'); // Address Site Admin
+define('admin_token', 'MTphZG1pbjpjYWMyYWQ1ZTU3NzQ4ZDg3NDgwNzJlZTU5ZWQzMTRmMA=='); // Address Site Admin
 
 
 /* --------------- FUNCIONES ------------- */
-
 ## Consulta SQL SELECT
 function datosSQL($sql){
 	$rawdata = new stdClass();
@@ -160,7 +170,7 @@ function loadWallets($userId){
 }
 
 function convertInFloat($balance, $decimals){
-	if($balance>0){ $float = ($balance / (10**$decimals)); }
+	if($balance>0){ $float = ($balance / (1**$decimals)); }
 	else { $float = 0; }
 	return number_format($float,$decimals,'.','');
 }
@@ -188,30 +198,74 @@ function createTX_DM(){
 	return '0x'.$reference.$uniqid;
 }
 
-function newTransaccionDM($from, $to, $value=0, $fee=0, $data=''){
+function newTransaccion($token, $coinId, $to, $value=0, $fee=0, $data=''){
+	$coin = CoinForId($coinId);
+	$token = decodeToken($token);
+	$userInfo = UserForId($token[0]);
+	
 	$sendr = new stdClass();
 	$sendr->error = true;
 	$sendr->id = (int) 0;
 	$sendr->tx = (string) createTX_DM();
-	$sendr->from = (string) $from;
+	$sendr->from = "";
 	$sendr->to = (string) $to;
-	$sendr->value = (float) $value;
-	$sendr->fee = (float) $fee;
+	$sendr->value = (double) $value;
+	$sendr->fee = (double) $fee;
 	$sendr->data = (string) $data;
-						
-	$create = crearSQL("INSERT INTO ".TBL_TRANSACTION." ( `tx`, `from`, `to`, `value`, `fee`, `data`, `coin` ) VALUES (?,?,?,?,?,?,?)",array(
-		$sendr->tx
-		, $sendr->from
-		, $sendr->to
-		, $sendr->value
-		, $sendr->fee
-		, $sendr->data
-		, 1
-	));
+	$sendr->balance_from = 0;
+	$sendr->balance_to = 0;
 	
-	if(isset($create->error) && $create->error == false){
-		$sendr->error = false;
-		$sendr->id = $create->last_id;
+	if(isset($userInfo->wallets->{$coin->symbol})){
+		$sendr->from = (string) $userInfo->wallets->{$coin->symbol}->address;
+		
+		$wallet_from = loadWalletOne($sendr->from, $coin->id);
+		$wallet_to = loadWalletOne($sendr->to, $coin->id);
+			
+		$sendr->balance_from = $wallet_from->balance;
+		$sendr->balance_to = $wallet_to->balance;
+		
+		
+		if($wallet_from->address !== $wallet_to->address){
+			$new_balance_from = $wallet_from->balance - ($sendr->value + $sendr->fee);
+			$new_balance_to = $wallet_to->balance + $sendr->value;
+			if(isset($wallet_from->balance) && $wallet_from->balance >= ($sendr->value + $sendr->fee)){				
+				$update_last_activity = crearSQL("UPDATE ".TBL_USER." SET last_activity=? where id='{$token[0]}'", array(date("Y-m-d H:i:s")));
+				
+				if(isset($update_last_activity->error) && $update_last_activity->error == false){
+					$update_balace_from = crearSQL("UPDATE ".TBL_WALLET." SET balance=? WHERE address='{$sendr->from}' AND coin='{$coin->id}' ",array(
+						$new_balance_from
+					));
+						
+					if(isset($update_balace_from->error) && $update_balace_from->error == false){
+						$sendr->balance_from = $new_balance_from;
+						$update_balace_to = crearSQL("UPDATE ".TBL_WALLET." SET balance=? WHERE address='{$sendr->to}' AND coin='{$coin->id}' ",array(
+							$new_balance_to
+						));
+						if(isset($update_balace_to->error) && $update_balace_to->error == false){
+							$sendr->balance_to = $new_balance_to;
+							$create = crearSQL("INSERT INTO ".TBL_TRANSACTION." ( `tx`, `from`, `to`, `value`, `fee`, `data`, `coin` ) VALUES (?,?,?,?,?,?,?)",array(
+								$sendr->tx
+								, $sendr->from
+								, $sendr->to
+								, $sendr->value
+								, $sendr->fee
+								, $sendr->data
+								, $coin->id
+							));
+							
+							if(isset($create->error) && $create->error == false){
+								$sendr->error = false;
+								$sendr->id = $create->last_id;
+								
+								
+							}
+						}
+					}
+				}
+				
+
+			}
+		}
 	}
 	return $sendr;
 }

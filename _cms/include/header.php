@@ -13,7 +13,7 @@ if(isset($_GET['q'])){ $q = $_GET['q']; }else{ $q = 'musica, series, peliculas..
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
 		<div class="collapse navbar-collapse" id="navbarCollapse">
 			<form class="navbar-nav mr-auto form-inline" method="search" action="search.dm">
-				<input class="form-control mr-sm-2" type="text" placeholder="<?php echo $q; ?>" aria-label="<?php echo $q; ?>" value="<?php echo $q; ?>"  name="q" id="q" />
+				<input class="form-control mr-sm-2" type="text" placeholder="<?php echo $q; ?>" aria-label="<?php echo $q; ?>" value="<?php echo $q; ?>"  name="q" id="q"  onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '<?php echo $q; ?>';}" />
 				<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
 			</form>
 			<ul class="navbar-nav mt-2 mt-md-0">

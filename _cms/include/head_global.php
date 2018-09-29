@@ -64,9 +64,7 @@ window.onload = function() {
 					})
 					.then(function (response) {
 						// console.log(response);
-						if(response.data.error == false){
-							jQuery(".wallet-DM-balance").html(response.data.data);
-						}
+						if(response.data.error == false){ jQuery(".wallet-DM-balance").html(response.data.data); }
 					})
 					.catch(function (error) { console.log(error); });
 				}

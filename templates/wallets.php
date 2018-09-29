@@ -39,7 +39,7 @@
 					</tr>
 					<tr>
 						<th>Balance</th>
-						<td><?php echo $walletInfo->balance; ?> <?php echo $walletInfo->symbol; ?>E-<?php echo $walletInfo->decimals; ?></td>
+						<td><?php echo $walletInfo->balance; ?> <?php echo $walletInfo->symbol; ?></td>
 					</tr>
 					<tr>
 						<th>Balance Real</th>
