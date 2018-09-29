@@ -22,6 +22,10 @@
 
   
 <script type="text/javascript">
+function isFunction(functionToCheck) {
+ return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+}
+
 function validateYouTubeUrl(url){
 	if (url != undefined || url != '') {
 		var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/;
@@ -53,8 +57,7 @@ window.onload = function() {
 		}
 		
 		<?php if(checkSession() == true){ ?>
-			if (typeof player != 'undefined'){
-				
+			if (typeof player != 'undefined' && typeof(player.getState) == 'function'){
 				var dmplayer = player.getState();
 				if(dmplayer == 'playing'){
 					axios.get('api/points', {
@@ -76,7 +79,4 @@ window.onload = function() {
 		clearInterval(myVar);
 	}
 }
-
-
-
 </script>

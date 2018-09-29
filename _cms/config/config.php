@@ -26,7 +26,7 @@ ini_set('display_errors', 'on');
 #date_default_timezone_set('America/Bogota'); // Configurar Zona Horaria
 define('site_name', 'deMedallo.com - El mejor contenido al alcance de un clic!'); // Titulo X defecto de la aplicacion
 define('site_name_md', 'deMedallo.com'); // Titulo X defecto small
-define('folderSitio', '/demedallo/website'); // Ruta de la carpeta del Sitio
+define('folderSitio', '/website'); // Ruta de la carpeta del Sitio
 define("SERVER_NAME", $_SERVER['SERVER_NAME']); // Definir nombre del servidor
 define("SERVER_HOST", $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME']); // Definir nombre del servidor con host -> ORGANIZAR -> $_SERVER['REQUEST_SCHEME'].
 #define('url_api', SERVER_HOST.folderAPI); // Definir url de la API
@@ -228,42 +228,35 @@ function newTransaccion($token, $coinId, $to, $value=0, $fee=0, $data=''){
 		if($wallet_from->address !== $wallet_to->address){
 			$new_balance_from = $wallet_from->balance - ($sendr->value + $sendr->fee);
 			$new_balance_to = $wallet_to->balance + $sendr->value;
-			if(isset($wallet_from->balance) && $wallet_from->balance >= ($sendr->value + $sendr->fee)){				
-				$update_last_activity = crearSQL("UPDATE ".TBL_USER." SET last_activity=? where id='{$token[0]}'", array(date("Y-m-d H:i:s")));
-				
-				if(isset($update_last_activity->error) && $update_last_activity->error == false){
-					$update_balace_from = crearSQL("UPDATE ".TBL_WALLET." SET balance=? WHERE address='{$sendr->from}' AND coin='{$coin->id}' ",array(
-						$new_balance_from
+			if(isset($wallet_from->balance) && $wallet_from->balance >= ($sendr->value + $sendr->fee)){
+				$update_balace_from = crearSQL("UPDATE ".TBL_WALLET." SET balance=? WHERE address='{$sendr->from}' AND coin='{$coin->id}' ",array(
+					$new_balance_from
+				));
+					
+				if(isset($update_balace_from->error) && $update_balace_from->error == false){
+					$sendr->balance_from = $new_balance_from;
+					$update_balace_to = crearSQL("UPDATE ".TBL_WALLET." SET balance=? WHERE address='{$sendr->to}' AND coin='{$coin->id}' ",array(
+						$new_balance_to
 					));
-						
-					if(isset($update_balace_from->error) && $update_balace_from->error == false){
-						$sendr->balance_from = $new_balance_from;
-						$update_balace_to = crearSQL("UPDATE ".TBL_WALLET." SET balance=? WHERE address='{$sendr->to}' AND coin='{$coin->id}' ",array(
-							$new_balance_to
+					if(isset($update_balace_to->error) && $update_balace_to->error == false){				
+						$sendr->balance_to = $new_balance_to;
+						$create = crearSQL("INSERT INTO ".TBL_TRANSACTION." ( `tx`, `from`, `to`, `value`, `fee`, `data`, `coin` ) VALUES (?,?,?,?,?,?,?)",array(
+							$sendr->tx
+							, $sendr->from
+							, $sendr->to
+							, $sendr->value
+							, $sendr->fee
+							, $sendr->data
+							, $coin->id
 						));
-						if(isset($update_balace_to->error) && $update_balace_to->error == false){
-							$sendr->balance_to = $new_balance_to;
-							$create = crearSQL("INSERT INTO ".TBL_TRANSACTION." ( `tx`, `from`, `to`, `value`, `fee`, `data`, `coin` ) VALUES (?,?,?,?,?,?,?)",array(
-								$sendr->tx
-								, $sendr->from
-								, $sendr->to
-								, $sendr->value
-								, $sendr->fee
-								, $sendr->data
-								, $coin->id
-							));
+						
+						if(isset($create->error) && $create->error == false){
+							$sendr->error = false;
+							$sendr->id = $create->last_id;
 							
-							if(isset($create->error) && $create->error == false){
-								$sendr->error = false;
-								$sendr->id = $create->last_id;
-								
-								
-							}
 						}
 					}
 				}
-				
-
 			}
 		}
 	}
