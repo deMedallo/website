@@ -49,7 +49,7 @@
 	  </div>
 	  <div class="col-md-4">
 		<?php 
-			$listTx = lastTx($walletInfo->address, $walletInfo->coin_id);
+			$listTx = lastTx($walletInfo->address, $walletInfo->coin_id, 25);
 		?>
 		<h2>Ultimas Actividades</h2>
 		<table class="table table-responsive" style="zoom: 0.7;">
@@ -69,7 +69,6 @@
 				<td><?php echo $demo->wallets->DM->symbol; ?></td>
 			</tr>
 			<?php } ?>
-			
 		</table>
 	  </div>
 	</div>

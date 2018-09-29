@@ -13,7 +13,6 @@ foreach($this->get('formats', []) as $format) {
 	}
 }
 ?>
-
 <div class="container marketing">
 	<hr class="featurette-divider">
 
