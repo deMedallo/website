@@ -135,15 +135,12 @@ foreach($this->get('formats', []) as $format) {
 					
 					<div id="player"></div>
 					<script>
-					  // 2. This code loads the IFrame Player API code asynchronously.
 					  var tag = document.createElement('script');
 
 					  tag.src = "https://www.youtube.com/iframe_api";
 					  var firstScriptTag = document.getElementsByTagName('script')[0];
 					  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-					  // 3. This function creates an <iframe> (and YouTube player)
-					  //    after the API code downloads.
+					  
 					  var playerYT;
 					  function onYouTubeIframeAPIReady() {
 						playerYT = new YT.Player('player', {
@@ -156,30 +153,22 @@ foreach($this->get('formats', []) as $format) {
 						  }
 						});
 					  }
-
-					  // 4. The API will call this function when the video player is ready.
+					  
 					  function onPlayerReady(event) {
 						event.target.playVideo();
 					  }
-
-					  // 5. The API calls this function when the player's state changes.
-					  //    The function indicates that when playing a video (state=1),
-					  //    the player should play for six seconds and then stop.
+					  
 					  var done = false;
 					  function onPlayerStateChange(event) {
 						  var myVarDos = setInterval(myTimerDos, 1000);
 						  
 						  function myTimerDos(){
-							if (event.data == YT.PlayerState.PLAYING) {
+							if (playerYT.getPlayerState() == 1) {
 								//console.log('OK');
 								//setTimeout(stopVideo, 6000);
 								//done = true;
 							  
-								axios.get('api/points', {
-									params: {
-										token: "<?php echo $_SESSION['token']; ?>"
-									}
-								})
+								axios.get('api/points', { params: { token: "<?php echo $_SESSION['token']; ?>" }})
 								.then(function (response) {
 									//console.log(response);
 									if(response.data.error == false){ jQuery(".wallet-DM-balance").html(response.data.data); }
@@ -193,7 +182,6 @@ foreach($this->get('formats', []) as $format) {
 						playerYT.stopVideo();
 					  }
 					</script>
-					
 				<?php }else{ ?>
 					<?php if(checkSession() == true){
 						$demo = UserForId($_SESSION['id']);
@@ -255,7 +243,7 @@ foreach($this->get('formats', []) as $format) {
 									  "tracks": [
 										//{
 										//  "kind": "thumbnails",
-										//  "file": "https://cdn.jwplayer.com/strips/8L4m9FJB-120.vtt"
+										//  file: "//www.youtube.com/watch?v=8CjdLYBDUqw",
 										//}
 									  ],
 									  "link": "#"
