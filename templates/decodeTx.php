@@ -17,7 +17,7 @@
 			<table class="table table-responsive">
 				<tr>
 					<th>TxHash</th>
-					<td><?php echo $txInfo->tx; ?></td>
+					<td><a href="tx.dm?tx=<?php echo $txInfo->tx; ?>"><?php echo $txInfo->tx; ?></a></td>
 				</tr>
 				<tr>
 					<th>TimeStamp</th>
@@ -32,32 +32,10 @@
 					<td><a href="wallets.dm?address=<?php echo $txInfo->to; ?>&coin=<?php echo $txInfo->coinInfo->id; ?>"><?php echo $txInfo->to; ?></a></td>
 				</tr>
 				<tr>
-					<th>Decimals</th>
-					<td><?php echo $txInfo->coinInfo->decimals; ?></td>
-				</tr>
-				<tr>
-					<th>Value</th>
-					<td><?php echo $txInfo->value; ?> <?php echo $txInfo->coinInfo->symbol; ?>E-<?php echo $txInfo->coinInfo->decimals; ?></td>
-				</tr>
-				<tr>
-					<th>Value Real</th>
-					<td><?php echo convertInFloat($txInfo->value, $txInfo->coinInfo->decimals); ?> <?php echo $txInfo->coinInfo->symbol; ?></td>
-				</tr>
-				<tr>
 					<th>Input data</th>
-					<td><textarea class="form-control" readonly="" spellcheck="false" style="width: 100%; font-size: small; font-family: Monospace; padding: 8px; background-color: #EEEEEE;" rows="5" id="inputdata"><?php echo $txInfo->data; ?></textarea></td>
-				</tr>
-				<tr>
-					<th>Input data</th>
-					<td><?php echo pack('H*', $txInfo->data); ?></td>
-				</tr>
-				<tr>
-					<th></th>
-					<td><a href="decodeTx.dm?tx=<?php echo $txInfo->tx; ?>" class="btn btn-info btn-md" >Decode Input Data <i class="fa fa-cog"></i></a></td>
+					<td><textarea class="form-control" readonly="" spellcheck="false" style="min-height: 250px; width: 100%; font-size: small; font-family: Monospace; padding: 8px; background-color: #EEEEEE;" rows="5" id="inputdata"><?php echo pack('H*', $txInfo->data); ?></textarea></td>
 				</tr>
 			</table>
-			
-			
 		</div>
 	</div>
 </div>

@@ -190,7 +190,6 @@ function loadWalletOne($address, $coin){
 	return $walletInfo;
 }
 
-
 #################### ------------------------------------- ------------------------------------- ####################
 # Check si la session existe.
 function checkSession(){
@@ -269,7 +268,6 @@ function newTransaccion($token, $coinId, $to, $value=0, $fee=0, $data=''){
 	return $sendr;
 }
 
-
 function lastTx($address, $coin_id=0, $limit=8, $order='DESC'){
 	$resultArray = array();
 	$result = datosSQL("Select * from ".TBL_TRANSACTION." where `from`='{$address}' AND `coin`='{$coin_id}' OR `to`='{$address}' AND `coin`='{$coin_id}' ORDER BY id {$order} LIMIT {$limit}");
@@ -292,7 +290,7 @@ function TransferForTx($tx){
 	return $resultado;
 }
 
-function ChartTxWallet($wallet, $coinId, $start, $end){
+function ChartTxWallet($wallet, $coinId, $start, $end, $enable_data=true){
 	$resultArray = array();
 	$result = datosSQL("Select * from ".TBL_TRANSACTION." where `from`='{$wallet}' AND `coin`='{$coinId}' and `create` >= ('{$end}') OR `to`='{$wallet}' AND `coin`='{$coinId}' and `create` >= ('{$end}') OR `from`='{$wallet}' AND `coin`='{$coinId}' and `create` <= ('{$start}') OR `to`='{$wallet}' AND `coin`='{$coinId}' AND `create` <= ('{$start}')");
 	
@@ -324,15 +322,51 @@ function ChartTxWallet($wallet, $coinId, $start, $end){
 			$chart->data[] = $obj->total;
 		}
 	}
+	if($enable_data == false){ unset($chart->complete); }
 	return $chart;
 }
 
+function loadWalletsCoin($coinId){
+	$walletsInfo = array();
+	$result = datosSQL("Select ".TBL_WALLET.".address as address, ".TBL_WALLET.".coin as coin_id, ".TBL_WALLET.".balance as balance, ".TBL_COIN.".name As name, ".TBL_COIN.".symbol As symbol, ".TBL_COIN.".decimals As decimals from ".TBL_WALLET." INNER JOIN ".TBL_COIN." ON ".TBL_WALLET.".coin='{$coinId}'");
+	if(isset($result->error) && $result->error == false && isset($result->data[0])){
+		
+		foreach($result->data As $object){
+			$walletsInfo[] = new BalanceWallet($object);
+		}
+	}	
+	return $walletsInfo;
+}
 
+function totalSendWallet($address, $coin_id=0){
+	$r = new stdClass();
+	$r->value = 0;
+	$r->total = 0;
+	$result = datosSQL("Select * from ".TBL_TRANSACTION." where `from`='{$address}' AND `coin`='{$coin_id}'  ");
+	if(isset($result->error) && $result->error == false && isset($result->data[0])){
+		$r->total = count($result->data);
+		foreach($result->data As $e){
+			$e['value'] = (double) $e['value'];
+			$r->value = $r->value+$e['value'];
+		}
+	}
+	return $r;
+}
 
-
-
-
-
+function totalRecibeWallet($address, $coin_id=0){
+	$r = new stdClass();
+	$r->value = 0;
+	$r->total = 0;
+	$result = datosSQL("Select * from ".TBL_TRANSACTION." where `to`='{$address}' AND `coin`='{$coin_id}' ");
+	if(isset($result->error) && $result->error == false && isset($result->data[0])){
+		$r->total = count($result->data);
+		foreach($result->data As $e){
+			$e['value'] = (double) $e['value'];
+			$r->value = $r->value+$e['value'];
+		}
+	}
+	return $r;
+}
 
 
 

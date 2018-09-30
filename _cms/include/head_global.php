@@ -56,7 +56,7 @@ window.onload = function() {
 			}
 		}
 		
-		<?php if(checkSession() == true){ ?>
+		<?php if(checkSession() == true && isset($_GET['page']) && $_GET['page'] == 'getvideo'){ ?>
 			if (typeof player != 'undefined' && typeof(player.getState) == 'function'){
 				var dmplayer = player.getState();
 				if(dmplayer == 'playing'){

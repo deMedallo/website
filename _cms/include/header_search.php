@@ -10,6 +10,12 @@ if(isset($_GET['q'])){ $q = $_GET['q']; }else{ $q = 'musica, series, peliculas..
 		<input type="text"  name="q" id="q" value="<?php echo $q; ?>" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '<?php echo $q; ?>';}">
 		<div class="contact_btn">
 		   <label class="btn1 btn-2 btn-2g"><input class="btn btn-default btn-lg" type="submit" name="type" id="type" value="Buscar"></label>
+		   
+				
+			<?php if(checkSession() == false){ ?>
+				<a href="login.dm" class="text-white btn btn-info btn-lg">Ingresar</a>
+				<a href="register.dm" class="text-white btn btn-secondary btn-lg">Soy nuevo</a>
+			<?php } ?>
 		</div>
 	</form>        		
 	<div class="clearfix"></div>

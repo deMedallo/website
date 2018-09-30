@@ -34,15 +34,14 @@
 		}
 	}
 ?>
-<div class="content_middle">
+<div class="content_middle text-center">
 	<div class="container">
 		<div class="row">
-			<hr>
-			<h1>Ingresar</h1>
-			<p>Ingresa tus datos en el formulario para acceder a deMedallo.</p>
-			<hr>
 			<div class="col-md-12">
-
+				<hr>
+				<h1>Ingresar</h1>
+				<p>Ingresa tus datos en el formulario para acceder a deMedallo.</p>
+				<hr>
 				<?php if($msg->e == true){ ?>
 					<div class="alert alert-info" role="alert">
 					  <?php echo $msg->t; ?>
@@ -50,7 +49,7 @@
 				<?php } ?>
 				
 				<div class="card text-center card  bg-default mb-3">
-					<form method="POST" action="">
+					<form method="POST" class="row">
 						<div class="col-md-6">
 							<div class="card-body">
 								<input type="text" name="mailornick" class="form-control input-sm chat-input" placeholder="Usuario" />
@@ -65,10 +64,9 @@
 							<div class="card-footer text-muted text-center">
 								<button type="submit" class="btn btn-secondary">Ingresar</button>
 							</div>
-					<hr><hr>
+							<hr><hr>
 						</div>
 					</form>
-					<hr><hr>
 				</div>
 			</div>
 			<hr>

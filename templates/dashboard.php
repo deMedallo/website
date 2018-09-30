@@ -15,7 +15,6 @@
 		<div class="row">
 			<h1 class="h2">
 			<hr>Tablero<hr></h1>
-			<p><?php echo json_encode($Wallets); ?></p>
 			<?php foreach($Wallets As $W=>$item){
 					$dt = new DateTime();
 					$today = $dt->format('Y-m-d H:i:s');
@@ -27,7 +26,6 @@
 			?>
 				<div class="col-md-12">
 					<h3>Actividad (<?php echo $W; ?>) / <?php echo ($today). ' - ' . ($old); ?></h3>
-					<p><?php echo json_encode($item); ?></p>
 					<table class="table">
 						<tr>
 							<th>Address: </th>
@@ -55,6 +53,34 @@
 						  </button>
 						</div>
 					</div>-->
+					<h4><hr>Cantidad Tx <hr></h4>
+					<?php
+						$totalSend = totalSendWallet($item->address, $item->coin_id);
+						$totalRecibe = totalRecibeWallet($item->address, $item->coin_id);
+					?>
+					<table class="table">
+						<tr>
+							<th></th>
+							<th>Total Tx</th>
+							<th>Valor Total</th>
+						</tr>
+						<tr>
+							<th>Enviado</th>
+							<td><?php echo $totalSend->total; ?></td>
+							<td><?php echo convertInFloat($totalSend->value, $item->decimals); ?></td>
+						</tr>
+						<tr>
+							<th>Recibido</th>
+							<td><?php echo $totalRecibe->total; ?></td>
+							<td><?php echo convertInFloat($totalRecibe->value, $item->decimals); ?></td>
+						</tr>
+						<tr>
+							<th>Total</th>
+							<td><?php echo $totalSend->total + $totalRecibe->total; ?></td>
+							<td><?php echo convertInFloat($totalRecibe->value + $totalRecibe->value, $item->decimals); ?></td>
+						</tr>
+					</table>
+					
 					<canvas class="my-4" id="myChart-<?php echo $W; ?>" width="900" height="380"></canvas>
 								
 					<script>
@@ -88,6 +114,7 @@
 					</script>
 				</div>
 				
+				<!--
 				<div class="col-md-12">
 					<h2 id="">Acceso Rapido</h2>
 					<table class="table table-striped table-sm">
@@ -100,10 +127,10 @@
 							<?php } ?>
 						  </tbody>
 					  </table>
-				</div>
+				</div>-->
 				
 				<div class="col-md-12">
-					<?php foreach($chart->complete As $day=>$list){ ?>
+					<?php /* foreach($chart->complete As $day=>$list){ ?>
 						<h2 id="<?php echo $day; ?>"><?php echo $day; ?></h2>
 						<div class="table-responsive">
 						<table class="table table-striped table-sm">
@@ -128,7 +155,7 @@
 							<?php } ?>
 						  </tbody>
 						</table>
-					<?php } ?>
+					<?php } */ ?>
 					</div>
 				</div>
 			<?php } ?>

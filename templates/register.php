@@ -93,43 +93,42 @@
 							<div class="panel panel-primary" style="margin:20px;">
 								<div class="panel-heading"><h3 class="panel-title">Formulario de registro</h3></div>
 								<div class="panel-body">
-									<form method="POST" class="form">
-										<div class="col-md-12 col-sm-12">
+									<form method="POST" class="form row">
+										<div class="col-md-6 col-sm-6">
 											<div class="form-group col-md-12 col-sm-12">
 												<label for="name">Nombre Completo*</label>
 												<input type="text" class="form-control input-sm" name="name" placeholder="">
 											</div>
-											<div class="form-group col-md-6 col-sm-6">
+											<div class="form-group col-md-12 col-sm-12">
 												<label for="name">Nick / Usuario*</label>
 												<input type="text" class="form-control input-sm" name="nick" placeholder="">
 											</div>
-											<div class="form-group col-md-6 col-sm-6">
+											<div class="form-group col-md-12 col-sm-12">
 												<label for="email">Correo Electronico*</label>
 												<input type="email" class="form-control input-sm" name="email" placeholder="">
 											</div>
-											<div class="form-group col-md-6 col-sm-6">
+											<div class="form-group col-md-12 col-sm-12">
 												<label for="pincode">Contraseña*</label>
 												<input type="password" class="form-control input-sm" name="pass1" placeholder="">
 											</div>
-											<div class="form-group col-md-6 col-sm-6">
+											<div class="form-group col-md-12 col-sm-12">
 												<label for="pincode">Verificar Contraseña*</label>
 												<input type="password" class="form-control input-sm" name="pass2" placeholder="">
 											</div>
-											<div class="form-group col-md-6 col-sm-6" >
+										</div>
+
+										<div class="col-md-6 col-sm-6">
+											<div class="form-group col-md-12 col-sm-12" >
+												<?php echo solvemedia_get_html("5JNz5YEWn5j50mNNCPmaY-yRLR-8VuMN");	//outputs the widget ?><br>
+											</div>
+											
+											<div class="form-group col-md-12 col-sm-12">
 												<label for="pincode">Terminos y condiciones</label>
 												<span class="help-block">Al registrase se da por enterado que el propietario de la cuenta leyó y acepta nuestros terminos y condiciones.</span>
 											</div>
-										</div>
-
-										<div class="col-md-12 col-sm-12">
-											<div class="form-group col-md-6 col-sm-6 pull-right" >
-												<?php echo solvemedia_get_html("5JNz5YEWn5j50mNNCPmaY-yRLR-8VuMN");	//outputs the widget ?>
-											</div>
-										</div>
-
-										<div class="col-md-12 col-sm-12">
-											<div class="form-group col-md-3 col-sm-3 pull-right" >
-												<input type="submit" class="btn btn-primary" value="Crear Cuenta"/>
+											
+											<div class="form-group col-md-12 col-sm-12 pull-right" >
+												<input type="submit" class="btn btn-primary" value="Crear mi cuenta"/>
 											</div>
 										</div>
 									</form>
