@@ -39,7 +39,7 @@
 					$msg->t = ('las contraseñas no coinciden, intente nuevamente.');
 				}else{
 					$datos['name'] = (string) $datos['name'];
-					$datos['nick'] = (string) $datos['nick'];
+					$datos['nick'] = stringParse($datos['nick']);
 					$datos['email'] = (string) $datos['email'];
 					$datos['pass1'] = (string) $datos['pass1'];
 					$datos['hash'] = md5($datos['pass1']);

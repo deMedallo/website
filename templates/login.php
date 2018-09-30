@@ -19,7 +19,8 @@
 		}
 		else {
 					
-			$_POST['hash'] = md5($_POST['hash']);		
+			$_POST['hash'] = md5($_POST['hash']);
+			$_POST['mailornick'] = stringParse($_POST['mailornick']);
 			$checkb = datosSQL("Select * from ".TBL_USER." where mail='{$_POST['mailornick']}' and hash='{$_POST['hash']}' OR nick='{$_POST['mailornick']}' and hash='{$_POST['hash']}'");
 			if(isset($checkb->error) && $checkb->error == false && isset($checkb->data[0])){			
 				$session = UserForId($checkb->data[0]['id']);

@@ -124,9 +124,15 @@ function eliminarSQL($sql){
 	$conn = null;
 	return $rawdata;
 };
-
 #################### ------------------------------------- ------------------------------------- ####################
+function stringParse($s){
+	$r = (string) $s;
+	$r = strtolower($r);
+	return $r;
+}
+
 function createToken($id, $nick, $hash){
+	$nick = stringParse($nick);
 	return base64_encode($id.':'.$nick.':'.$hash);
 }
 
@@ -286,6 +292,40 @@ function TransferForTx($tx){
 	return $resultado;
 }
 
+function ChartTxWallet($wallet, $coinId, $start, $end){
+	$resultArray = array();
+	$result = datosSQL("Select * from ".TBL_TRANSACTION." where `from`='{$wallet}' AND `coin`='{$coinId}' and `create` >= ('{$end}') OR `to`='{$wallet}' AND `coin`='{$coinId}' and `create` >= ('{$end}') OR `from`='{$wallet}' AND `coin`='{$coinId}' and `create` <= ('{$start}') OR `to`='{$wallet}' AND `coin`='{$coinId}' AND `create` <= ('{$start}')");
+	
+	$chart = new stdClass();
+	$chart->labels = array();
+	$chart->data = array();
+	$chart->complete = new stdClass();
+	if(isset($result->error) && $result->error == false && isset($result->data[0])){
+		foreach($result->data As $tx){
+			$tx = new TransferInfo($tx);
+			$resultArray[] = ($tx);
+			
+			$day = date('Y-m-d', strtotime($tx->create));
+			
+			if(isset($chart->complete->{$day})){
+				$chart->complete->{$day}->total++;
+				$chart->complete->{$day}->data[] = $tx;
+			}else{
+				$chart->complete->{$day} = new stdClass();
+				$chart->complete->{$day}->label = $day;
+				$chart->complete->{$day}->total = 1;
+				$chart->complete->{$day}->data = array();
+				$chart->complete->{$day}->data[] = $tx;
+			}
+		}
+		
+		foreach($chart->complete As $k=>$obj){
+			$chart->labels[] = $obj->label;
+			$chart->data[] = $obj->total;
+		}
+	}
+	return $chart;
+}
 
 
 

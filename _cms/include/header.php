@@ -5,7 +5,7 @@ if(isset($_GET['q'])){ $q = $_GET['q']; }else{ $q = 'musica, series, peliculas..
 
 <header>
 	<nav class="navbar navbar-expand-md navbar-dark sticky-top bg-dark">
-		<a class="navbar-brand" href="home.dm">
+		<a class="navbar-brand" href="index.dm">
 			<img src="images/logo.png" height="52" class="d-inline-block align-top" alt="">
 			
 		</a>
@@ -71,6 +71,7 @@ if(isset($_GET['q'])){ $q = $_GET['q']; }else{ $q = 'musica, series, peliculas..
 						$demo = UserForId($_SESSION['id']);
 						$listTx = lastTx($demo->wallets->DM->address, $demo->wallets->DM->coin_id);		
 					 ?>
+						<li class="nav-item"><a class="nav-link" href="<?php echo url_site; ?>/dashboard.dm" id="registerButton">Tablero</a></li>
 					
 						<li class="nav-item dropdown">
 							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -126,7 +127,16 @@ if(isset($_GET['q'])){ $q = $_GET['q']; }else{ $q = 'musica, series, peliculas..
 								</fieldset>
 							</div>
 						</li>
-						
+						<!--<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								Minar
+							</a>
+							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+								<a class="dropdown-item" href="#" target="_new">DM - deMedallo</a>
+								<div class="dropdown-divider"></div>
+								<a class="dropdown-item" href="#">WEB - WebChain</a>
+							</div>
+						</li>-->
 						<li class="nav-item"><a class="nav-link" href="<?php echo url_site; ?>/logout.dm" id="registerButton">Salir</a></li>
 				 <?php } ?>
 			</ul>
