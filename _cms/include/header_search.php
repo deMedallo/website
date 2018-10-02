@@ -16,6 +16,8 @@ if(isset($_GET['q'])){ $q = $_GET['q']; }else{ $q = 'musica, series, peliculas..
 				<a href="login.dm" class="text-white btn btn-info btn-lg">Ingresar</a>
 				<a href="register.dm" class="text-white btn btn-secondary btn-lg">Soy nuevo</a>
 			<?php } ?>
+			
+			
 		</div>
 	</form>        		
 	<div class="clearfix"></div>

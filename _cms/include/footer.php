@@ -35,6 +35,11 @@
 					<li><a href="https://www.facebook.com/TiendadeMedallo/">Facebook</a></li>
 					<li><a href="https://github.com/deMedallo/">GitHub</a></li>
 				</ul>
+				<h4>Estadisticas</h4>
+					
+				<ul class="list1">
+					<li><a>DM: </a></li>
+				</ul>
 			</div>
 			<div class="footer-grid last_grid">
 				<h4>Follow Us</h4>
