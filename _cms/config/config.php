@@ -370,5 +370,92 @@ function totalRecibeWallet($address, $coin_id=0){
 
 
 
+class WalletValidator
+{
+	var $address = '';
+	
+    public function isAddress(): bool
+    {
+        if ($this->matchesPattern($this->address)) {
+            return $this->isAllSameCaps($this->address) ?: $this->isValidChecksum($this->address);
+        }
+
+        return false;
+    }
+
+    protected function matchesPattern(): int
+    {
+        return preg_match('/^(0x)?[0-9a-f]{32}$/i', $this->address);
+    }
+
+    protected function isAllSameCaps(): bool
+    {
+        return preg_match('/^(0x)?[0-9a-f]{32}$/', $this->address) || preg_match('/^(0x)?[0-9A-F]{32}$/', $this->address);
+    }
+
+    protected function isValidChecksum()
+    {
+        $address = str_replace('0x', '', $this->address);
+		
+        for ($i = 0; $i < 32; $i++ ) {
+            if (ctype_alpha($address{$i})) {
+                $charInt = intval($hash{$i}, 16);
+                if ((ctype_upper($address{$i}) && $charInt <= 7) || (ctype_lower($address{$i}) && $charInt > 7)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+	
+	function __construct(string $address) {
+	   $this->address = $address;
+	}
+}
+
+class TxValidator
+{
+	var $tx = '';
+	
+    public function isTx(): bool
+    {
+        if ($this->matchesPattern($this->tx)) {
+            return $this->isAllSameCaps($this->tx) ?: $this->isValidChecksum($this->tx);
+        }
+
+        return false;
+    }
+
+    protected function matchesPattern(): int
+    {
+        return preg_match('/^(0x)?[0-9a-f]{64}$/i', $this->tx);
+    }
+
+    protected function isAllSameCaps(): bool
+    {
+        return preg_match('/^(0x)?[0-9a-f]{64}$/', $this->tx) || preg_match('/^(0x)?[0-9A-F]{64}$/', $this->tx);
+    }
+
+    protected function isValidChecksum()
+    {
+        $tx = str_replace('0x', '', $this->tx);
+		
+        for ($i = 0; $i < 64; $i++ ) {
+            if (ctype_alpha($tx{$i})) {
+                $charInt = intval($hash{$i}, 16);
+                if ((ctype_upper($tx{$i}) && $charInt <= 7) || (ctype_lower($tx{$i}) && $charInt > 7)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+	
+	function __construct(string $tx) {
+	   $this->tx = $tx;
+	}
+}
 
 

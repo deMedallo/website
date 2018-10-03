@@ -1,5 +1,30 @@
 <?php
 
+Class VideoInfo{
+	var $videoid = '';
+	var $title = '';
+	var $description = '';
+	var $thumbnail = '';
+	var $videos = array();
+	var $total_videos = 0;
+	var $audios = array();
+	var $total_audios = 0;
+	var $tags = array();
+	#var $mp3_download_url = '';
+	#var $mp3_download_quality = '';
+	
+	function __construct($args=array()) {
+		if(isset($args['videoid'])){ $this->id = (string) $args['videoid']; }
+		if(isset($args['title'])){ $this->title = (string) $args['title']; }	
+		if(isset($args['description'])){ $this->description = (string) $args['description']; }	
+		if(isset($args['thumbnail'])){ $this->thumbnail = (string) $args['thumbnail']; }	
+		if(isset($args['videos'])){ $this->videos = (array) $args['videos']; }
+		$this->total_videos = count($this->videos);
+		#if(isset($args['mp3_download_url'])){ $this->mp3_download_url = (string) $args['mp3_download_url']; }	
+		#if(isset($args['mp3_download_quality'])){ $this->mp3_download_quality = (string) $args['mp3_download_quality']; }	
+	}
+}
+
 Class CoinInfo{
 	var $id = 0;
 	var $name = '';
@@ -31,7 +56,6 @@ Class BalanceWallet{
 		if(isset($args['decimals'])){ $this->decimals = (int) $args['decimals']; }	
 	}
 }
-
 
 Class UserInfo{
 	var $id = 0;

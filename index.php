@@ -11,7 +11,6 @@
 		<meta name="author" content="">
 		<link rel="icon" href="favicon.ico">
 		<title>deMedallo.com | Musica, Series, Videos, Tutoriales, Descargas y mucho mas!!</title>
-
 		<link href="dist/bootstrap/4.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 		<link href="assets/carousel.css" rel="stylesheet">
 		<!--<link href="assets/style.css" rel="stylesheet">-->
@@ -19,21 +18,9 @@
 		<link href="https://vjs.zencdn.net/7.1.0/video-js.css" rel="stylesheet">
 		<!-- If you'd like to support IE8 (for Video.js versions prior to v7) -->
 		<!-- <script src="https://vjs.zencdn.net/ie8/ie8-version/videojs-ie8.min.js"></script> -->
+		
+		<script src="//content.jwplatform.com/libraries/IDzF9Zmk.js"></script>
 
-		<script type="text/javascript">
-			function validateYouTubeUrl(url){
-				if (url != undefined || url != '') {
-					var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/;
-					var match = url.match(regExp);
-					if (match && match[2].length == 11) {
-						// Do anything for being valid
-						// if need to change the url to embed url then use below line
-						return match[2];
-					}
-					else { return null; }
-				}
-			}
-		</script>
 		<!--
 			<script src="https://unpkg.com/vue/dist/vue.js"></script>
 			<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
@@ -83,7 +70,7 @@
 								<div class="panel panel-primary" style="margin:20px;">
 									<div class="panel-heading"><h3 class="panel-title">Formulario de registro</h3></div>
 									<div class="panel-body">
-										<form method="POST" class="form row"action="javascript:false;" @submit="submitRegister">
+										<form method="POST" class="form row" action="javascript:false;" @submit="submitRegister">
 											<div class="col-md-6 col-sm-6">
 												<div class="form-group col-md-12 col-sm-12">
 													<label for="name">Nombre Completo*</label>
@@ -156,9 +143,11 @@
 						</tr>
 						<tr>
 							<td>
-								<router-link tag="a" class="btn btn-secondary" colspan="2" v-bind:to="'/lastTx/' + wallet.address + '/' + wallet.coin_id">Transacciones</router-link>
+								<router-link tag="a" class="btn btn-secondary" v-bind:to="'/lastTx/' + wallet.address + '/' + wallet.coin_id">Transacciones</router-link>
 							</td>
-							<td><a href="sendW.dm?coin=coin_id" class="btn btn-info">Enviar</a></td>
+							<td>
+								<router-link tag="a" class="btn btn-info" v-bind:to="'/sendW/' + wallet.symbol">Enviar</router-link>
+							</td>
 						</tr>
 					</table>
 					
@@ -168,7 +157,7 @@
 		
 		<template id="viewWallets-template">
 			<div>
-				<div class="container marketing">
+				<div class="container marketing" v-if="error == false">
 					<h1><hr>Visor de Billetera:  <span></span></h1>
 					<h2>{{ balance.toFixed(decimals) }} {{ symbol }}</h2>
 					<hr>
@@ -177,7 +166,9 @@
 						<table class="table">
 							<tr><th>Address</th><td>{{ $route.params.address }}</td></tr>
 							<tr><th>Name</th><td>{{ name }}</td></tr>
-							<tr><th>Symbol</th><td><a href="teamW.dm?coin=">{{ symbol }}</a></td></tr>
+							<tr><th>Symbol</th><td>
+								<router-link tag="a" v-bind:to="'/teamW/' + $route.params.coin_id">{{ symbol }}</router-link>
+							</td></tr>
 							<tr><th>Decimals</th><td>{{ decimals }}</td></tr>
 							<tr><th>Balance</th><td>{{ balance.toFixed(decimals) }}</td></tr>
 							<tr><th>Total Envios</th><td>{{ totalSend.total }}</td></tr>
@@ -195,386 +186,439 @@
 								<th>To</th>
 								<th>Value</th>
 								<th>Coin</th>
-							<tr>
-							<tr v-for="tx in lastTx">
-								<td title=""><a href="tx.dm?tx=">{{ tx.tx }}</a></td>
-								<td title=""><a href="wallets.dm?address=&coin=">{{ tx.from }}</a></td>
-								<td title=""><a href="wallets.dm?address=&coin=">{{ tx.to }}</a></td>
+							</tr>
+							<tr v-for="tx in lastTx" :key="tx.tx">
+								<td title="">
+									<router-link tag="a"  :to="'/tx/' + tx.tx">{{ tx.tx }}</router-link>
+								</td>
+								<td title="">
+									<router-link tag="a" v-bind:to="'/wallet/' + tx.from + '/' + tx.coinInfo.id">{{ tx.from }}</router-link>
+								</td>
+								<td title="">
+									<router-link tag="a" v-bind:to="'/wallet/' + tx.to + '/' + tx.coinInfo.id">{{ tx.to }}</router-link>
+								</td>
 								<td>{{ tx.value.toFixed(decimals) }}</td>
-								<td>{{ symbol }}</td>
+								<td>{{ tx.coinInfo.symbol }}</td>
 							</tr>
 						</table>
-						<a href="lastTx.dm?address=address&coin=coin_id" class="btn btn-md btn-primary">Ver mas</a>
+						<router-link tag="a" v-bind:to="'/lastTx/' + $route.params.address + '/' + $route.params.coin_id"  class="btn btn-md btn-primary">Ver mas</router-link>
+					  </div>
+					</div>
+				</div>
+				
+				 
+				<div class="container marketing" v-else="">
+					<h1><hr>Visor de Billetera:  <span></span></h1>
+					<h2></h2>
+					<hr>
+					<div class="row">
+						<div class="col-md-12">
+							<h3>Billetera: <span>{{ $route.params.address }} </span></h3>
+							<p>Billetera no encontrada verifique la direccion e intente nuevamente.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</template>
+		
+		<template id="viewTx-template">
+			<div>
+				<div class="container marketing">
+					<h1><hr>Visor de Transaccion</h1>
+					<hr>
+					<div class="row">
+						<hr>
+						<div class="col-md-12" v-if="error == false">
+							<h3>Transaccion: <span>{{ $route.params.tx }}  ( {{ coinInfo.symbol }} )</span></h3>
+							<table class="table table-responsive">
+								<tr>
+									<th>TxHash</th>
+									<td>{{ tx }}</td>
+								</tr>
+								<tr>
+									<th>TimeStamp</th>
+									<td>{{ create }}</td>
+								</tr>
+								<tr>
+									<th>From</th>
+									<td>
+										<router-link tag="a" v-bind:to="'/wallet/' + from + '/' + coinInfo.id">{{ from }}</router-link>
+									</td>
+								</tr>
+								<tr>
+									<th>To</th>
+									<td>
+										<router-link tag="a" v-bind:to="'/wallet/' + to + '/' + coinInfo.id">{{ to }}</router-link>
+									</td>
+								</tr>
+								<tr>
+									<th>Decimals</th>
+									<td>{{ coinInfo.decimals }}</td>
+								</tr>
+								<tr>
+									<th>Value</th>
+									<td>{{ value }}</td>
+								</tr>
+								<tr>
+									<th>Input data</th>
+									<td><textarea class="form-control" readonly="" spellcheck="false" style="width: 100%; font-size: small; font-family: Monospace; padding: 8px; background-color: #EEEEEE;" rows="5" id="inputdata">{{ data }}</textarea></td>
+								</tr>
+								<tr>
+									<th></th>
+									<td>
+										<router-link class="btn btn-info btn-md" tag="a" v-bind:to="'/decodeTx/' + tx">Decode Input Data <i class="fa fa-cog"></i></router-link>
+									</td>
+								</tr>
+							</table>
+						</div>
+						<div class="col-md-12" v-else="">
+							<h3>Transaccion: <span>{{ $route.params.tx }} </span></h3>
+							<p>Transaccion no encontrada verifique el TX e intente nuevamente.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</template>
+		
+		<template id="viewLastTx-template">
+			<div>
+				<div class="container marketing">
+					<h1><hr>Ultima Actividad</h1>
+						<table class="table">
+							<tr>
+								<th>Address</th>
+								<td>
+									<router-link tag="a" v-bind:to="'/wallet/' + address + '/' + $route.params.coin_id">{{ address }}</router-link>
+								</td>
+								<th>Name</th>
+								<td>{{ name }}</td>
+							</tr>
+							<tr>
+								<th>Symbol</th>
+								<td><router-link tag="a" v-bind:to="'/teamW/' + $route.params.coin_id">{{ symbol }}</router-link></td>
+								<th>Decimals</th>
+								<td>{{ decimals }}</td>
+							</tr>
+							<tr>
+								<th><h3>Balance: </h3></th>	
+								<td>{{ balance }}</td>
+							</tr>
+						</table>
+					<div class="row">
+					  <div class="col-md-12">
+						<h2>Ultimas Actividades</h2>
+						<table class="table table-responsive" style="zoom: 0.7;">
+							<tr>
+								<th>Tx</th>
+								<th>From</th>
+								<th>To</th>
+								<th>Value</th>
+								<th>Coin</th>
+							</tr>
+							<tr v-for="tx in lastTx">
+								<td title="">
+									<router-link tag="a"  :to="'/tx/' + tx.tx">{{ tx.tx }}</router-link>
+								</td>
+								<td title="">
+									<router-link tag="a" v-bind:to="'/wallet/' + tx.from + '/' + tx.coinInfo.id">{{ tx.from }}</router-link>
+								</td>
+								<td title="">
+									<router-link tag="a" v-bind:to="'/wallet/' + tx.to + '/' + tx.coinInfo.id">{{ tx.to }}</router-link>
+								</td>
+								<td>{{ tx.value.toFixed(decimals) }}</td>
+								<td>{{ tx.coinInfo.symbol }}</td>
+							</tr>
+						</table>
 					  </div>
 					</div>
 				</div>
 			</div>
 		</template>
 		
-<!-- Placed at the end of the document so the pages load faster -->
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
-<script src="dist/bootstrap/4.1.3/site/docs/4.1/assets/js/vendor/popper.min.js"></script>
-<script src="dist/bootstrap/4.1.3/dist/js/bootstrap.min.js"></script>
-<!-- Just to make our placeholder images work. Don't actually copy the next line! -->
-<script src="dist/bootstrap/4.1.3/site/docs/4.1/assets/js/vendor/holder.min.js"></script>
-
-<script>
-const _DM = axios.create({
-  baseURL: 'http://localhost/website/api',
-  timeout: 1000,
-  headers: {'X-Custom-Header': 'foobar'}
-});
-
-const component_formRegister = Vue.component('component_formRegister', {
-	data: function () {
-		return {
-			error: false,
-			message: '',
-			name: '',
-			nick: '',
-			email: '',
-			pass1: '',
-			pass2: '',
-			adcopy_challenge: '',
-			adcopy_response: ''
-		}
-	},
-	template: '#formRegister-template',
-	created(){
-		var self = this;
-		var sessionCheck = self.$parent.checkSession();
-		if(sessionCheck == true){
-			return false;
-		}
-		setTimeout(function(){
-			self.$parent.realoadCaptcha('acwidget-register')
-		}, 1000);
-	},
-	methods: {
-		submitRegister: function(){
-			var self = this;
-			console.log('submit register');
-			var nameCap = 'acwidget-register';
-			self.adcopy_challenge = jQuery("#adcopy_challenge-" + nameCap).val();
-			self.adcopy_response = jQuery("#adcopy_response-" + nameCap).val();
-			
-			dataSend = {
-				name: self.name,
-				nick: self.nick,
-				email: self.email,
-				pass1: self.pass1,
-				pass2: self.pass2,
-				adcopy_response: self.adcopy_response,
-				adcopy_challenge: self.adcopy_challenge
-			};
-			
-			_DM.get('/register', {
-				params: dataSend
-			})
-			.then(function (response) {
-				console.log(response.data);
-				
-				self.error = response.data.error;
-				self.message = response.data.msg;
-				
-				if(response.data.error == false){ self.$parent.saveSession(response.data.data); }
-			})
-			.catch(function (error) {
-				console.log(error);
-			})
-			.then(function (response) {
-			});
-			
-			self.$parent.realoadCaptcha(nameCap);
-		}
-	}
-});
-
-const component_formLogin = Vue.component('component_formLogin', {
-	data: function () {
-		return {
-			error: false,
-			message: '',
-			mailornick: '',
-			hash: '',
-			adcopy_challenge: '',
-			adcopy_response: ''
-		}
-	},
-	template: '#formLogin-template',
-	created(){
-		var self = this;
-		setTimeout(function(){
-			self.$parent.realoadCaptcha('acwidget-login')
-		}, 1000);
-	},
-	methods: {
-		submitLogin: function(){
-			var self = this;
-			console.log('submit');
-			var nameCap = 'acwidget-login';
-			
-			self.adcopy_challenge = jQuery("#adcopy_challenge-" + nameCap).val();
-			self.adcopy_response = jQuery("#adcopy_response-" + nameCap).val();
-			
-			dataSend = {
-				mailornick: self.mailornick,
-				hash: self.hash,
-				adcopy_response: self.adcopy_response,
-				adcopy_challenge: self.adcopy_challenge
-			};
-			
-			_DM.get('/login', {
-				params: dataSend
-			})
-			.then(function (response) {
-				console.log(response.data);
-				
-				self.error = response.data.error;
-				self.message = response.data.msg;
-				
-				if(response.data.error == false){ self.$parent.saveSession(response.data.data); }
-			})
-			.catch(function (error) {
-				console.log(error);
-			})
-			.then(function (response) {
-			});
-			
-			self.$parent.realoadCaptcha(nameCap);
-		}
-	}
-});
-
-const component_myaccountModal = Vue.component('component_myaccountModal', {
-	data: function () {
-		return {
-			nick: '',
-		}
-	},
-	template: '#myaccountModal-template',
-	created(){
-		
-	},
-	methods: {
-	}
-});
-
-const component_viewWallets = Vue.component('component_viewWallets', {
-	data: function () {
-		return {
-			error: false,
-			message: '',
-			address: '',
-			coin_id: 0,
-			balance: 0,
-			name: '',
-			symbol: '',
-			decimals: 0.0,
-			totalSend: {},
-			totalRecibe: {},
-			lastTx: [],
-		}
-	},
-	template: '#viewWallets-template',
-	created(){
-		var self = this;
-		
-		dataSend = {
-			token: self.$parent.token,
-			address: self.$route.params.address,
-			coin_id: self.$route.params.coin_id
-		};
-		
-		_DM.get('/wallets', {
-			params: dataSend
-		})
-		.then(function (response) {
-			var target = response.data;
-			console.log(target);
-			
-			if(target.error == false){
-				for (var k in target.data){
-					if (typeof target.data[k] !== 'function') {
-						self[k] = (target.data[k]);
-					}
-				}
-			}
-		})
-		.catch(function (error) {
-			console.log(error);
-		})
-		.then(function (response) {
-		});
-	},
-	methods: {
-	}
-});
-
-const routes = [
-	{ path: '/wallet/:address/:coin_id', component: component_viewWallets },
-	{ path: '/Register', component: component_formRegister },
-];
-
-const router = new VueRouter({
-  routes
-})
-
-new Vue({
-	el: '#app',
-	router: router,
-	components: {
-		'component_formLogin': component_formLogin
-	},
-	data: {
-		isLogin: false,
-		name: '',
-		nick: '',
-		token: '',
-		refers: 0,
-		mail: '',
-		userid: 0,
-		actived: 0,
-		banned: 0,
-		create: '',
-		wallets: [],
-	},
-	created() {
-		var self = this;
-		self.loadCaptcha();
-		self.checkSession();
-		
-		// console.log(self.wallets);
-	},
-	mounted() {
-		jQuery('.dropdown-toggle').on('click', function (e) {
-		  $(this).next().toggle();
-		});
-		jQuery('.dropdown-menu.keep-open').on('click', function (e) {
-		  e.stopPropagation();
-		});
-
-		if(1) {
-		  $('body').attr('tabindex', '0');
-		}
-		else {
-		  alertify.confirm().set({'reverseButtons': true});
-		  alertify.prompt().set({'reverseButtons': true});
-		}
-	},
-	watch: {
-		//token(newName) { localStorage.token = newName; }
-	},
-	methods: {
-		checkSession(){
-			var self = this;
-			if (localStorage.token) {
-				self.isLogin = true;
-				self.name = localStorage.name;
-				self.nick = localStorage.nick;
-				self.token = localStorage.token;
-				self.mail = localStorage.mail;
-				self.userid = localStorage.id;
-				self.create = localStorage.create;
-				self.refers = localStorage.refers;
-				self.banned = localStorage.banned;
-				self.actived = localStorage.actived;
-				self.wallets = JSON.parse(localStorage.wallets);
-				
-				return true;
-			}
-			else{
-				self.isLogin = false;
-				return false;
-			}
-		},
-		saveSession(target){
-			var self = this;
-			
-			for (var k in target){
-				if (typeof target[k] !== 'function') {
-					if(k == 'wallets'){
-						localStorage.setItem(k, JSON.stringify(target[k]));
-					}else{
-						localStorage.setItem(k, target[k]);
-					}
-				}
-			}
-			location.reload();
-		},
-		loadCaptcha() {
-			let recaptchaScript = document.createElement('script');
-			recaptchaScript.setAttribute('src', 'http://api.solvemedia.com/papi/challenge.ajax');
-			document.head.appendChild(recaptchaScript);
-			// console.log('solvemedia cargado.');
-		},
-		realoadCaptcha(element){
-			ACPuzzle.create('5JNz5YEWn5j50mNNCPmaY-yRLR-8VuMN', element, { multi: true, id: element, lang: 'de', size: 'standard' });
-		},
-		LogOut() {
-			localStorage.clear();
-			location.reload();
-		}
-	},
-	beforeCreate:function(){
-		
-	},
-	template: `<div>
-		<header>
-			<nav class="navbar navbar-expand-md navbar-dark sticky-top bg-dark">
-				<a class="navbar-brand" href="index.dm"><img src="images/logo.png" height="52" class="d-inline-block align-top" alt=""></a>
-				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
-				<div class="collapse navbar-collapse" id="navbarCollapse">
-					<form class="navbar-nav mr-auto form-inline" method="search" action="search.dm">
-						<input class="form-control mr-sm-2" type="text" placeholder="¿Que Buscas?" aria-label="¿Que Buscas?" value=""  name="q" id="q"  onfocus="" onblur="" />
-						<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-					</form>
-					<ul class="navbar-nav mt-2 mt-md-0">
-						<!--
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Minar</a>
-							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-								<a class="dropdown-item" href="#" target="_new">DM - deMedallo</a>
-								<div class="dropdown-divider"></div>
-							</div>
-						</li>-->
-						
-						<li class="nav-item dropdown" v-if="isLogin == false">
-							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Ingresar</a>
-							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-								<component_formLogin></component_formLogin>								
-							</div>
-						</li>
-						<li class="nav-item dropdown" v-else="">
-							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ nick }}</a>
-							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-								<a class="dropdown-item" href="#" target="_new">DM - deMedallo</a>
-								<div class="dropdown-divider"></div>
-								<component_myaccountModal></component_myaccountModal>
-							</div>
-						</li>
-						
- 
-						<li class="nav-item" v-if="isLogin == true"><a class="nav-link" @click="LogOut()">Salir</a></li>
-						<router-link tag="li" class="nav-item" to="/Register" v-else=""><a class="nav-link" >Crear Cuenta</a></router-link>
-						<!---->
-					</ul>
+		<template id="viewTeamW-template">
+			<div>
+				<div class="container marketing">
+					<h1><hr>Participantes : {{ name }} ( {{ symbol }} )</h1>
+					<hr>
+					
+					<table class="table">
+						<tr>
+							<th>Name</th>
+							<td>{{ name }}</td>
+						</tr>
+						<tr>
+							<th>Symbol</th>
+							<td>{{ symbol }}</td>
+						</tr>
+						<tr>
+							<th>Decimals</th>
+							<td>{{ decimals }}</td>
+						</tr>
+					</table>
+					
+					<div class="row">
+					  <div class="col-md-12">
+						<table class="table" style="zoom: 0.7;">
+							<tr>
+								<th>Address</th>
+								<th>Balance</th>
+							</tr>
+							<tr v-for="wallet in wallets">
+								<td title="">
+									<router-link tag="a" v-bind:to="'/wallet/' + wallet.address + '/' + wallet.coin_id">{{ wallet.address }}</router-link>
+								</td>
+								<td title="">{{ wallet.balance }}</td>
+							</tr>
+						</table>
+					  </div>
+					</div>
+					<hr>
 				</div>
-			</nav>
-		</header>
-
-		<main role="main">
-			<transition>
-			  <keep-alive>
-				<router-view></router-view>
-			  </keep-alive>
-			</transition>
-		</main>
-	</div>`
-});
-
+			</div>
+		</template>
 		
-		</script>
+		<template id="viewSendW-template">
+			<div>
+				<div class="container marketing">
+					<h1><hr>Enviar : {{ $parent.wallets[$route.params.coin_symbol].name }} ( {{ $route.params.coin_symbol }} )</h1>
+					<h3>Balance: {{ $parent.wallets[$route.params.coin_symbol].balance.toFixed($parent.wallets[$route.params.coin_symbol].decimals) }}</h3>
+					<hr>
+					<!-- ALERTS -->
+					<div class="alert alert-danger" role="alert" v-if="error == true">
+					  {{ message }}
+					</div>
+					<div class="alert alert-success" role="alert" v-if="error == false && message != ''">
+						{{ message }}
+						<hr>
+						<router-link tag="a" :to="'/tx/' + txResult">{{ txResult }}</router-link>
+					</div>
+					
+					<div class="dropdown-divider"></div>
+								
+					<form method="POST" action="javascript:false;" @submit="submitSendW">
+						<table class="table">
+							<tr>
+								<th>Direccion Destino</th>
+								<td><input class="form-control" type="text" value="" v-model="to"></td>
+							</tr>
+							<tr>
+								<th>Valor</th>
+								<td><input class="form-control" type="number" v-model="value" min="0" :step="step" ></td>
+							</tr>
+							 
+							<tr>
+								<th>Fee</th>
+								<td><input class="form-control" disabled value="0" v-model="fee"></td>
+							</tr>
+							<tr>
+								<th>Data</th>
+								<td><textarea class="form-control" spellcheck="false" style="width: 100%; font-size: small; font-family: Monospace; padding: 8px; background-color: #EEEEEE;" rows="5" v-model="data"></textarea></td>
+							</tr>
+							<tr>
+								<th>Captcha</th>
+								<td class="text-center"><div id="acwidget-sendW"></div></td>
+							</tr>
+							<tr>
+								<th></th>
+								<td><input type="submit" class="btn btn-success" value="Enviar"></td>
+							</tr>
+						</table>
+					</form>
+				</div>
+			</div>
+		</template>
+		
+		<template id="headerSearch-template">
+			<div>
+				<div class="banner">
+				  <div class="container_wrap">
+					<h1>¿Que Buscas?</h1>
+					<form class="" method="search" action="javascript:false; " @submit="submitSearch">
+						<input type="text"  name="q" id="q2" value="" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '';}" v-model="search">
+						<div class="contact_btn">
+						   <label class="btn1 btn-2 btn-2g"><input class="btn btn-default btn-lg" type="submit" name="type"  value="Buscar"></label>
+						</div>
+					</form>        		
+					<div class="clearfix"></div>
+				  </div>
+				</div>
+			</div>
+		</template>
+		
+		<template id="Footer-template">
+			<div>
+				<footer class="container">
+					<p class="float-right"><a href="#">Back to top</a></p>
+					<p>Donations &middot; <a><b>ETH</b>: 0x0cb159875098ad4ee77b5c3d4f6de636c823235b</a> &middot; <a href="terms-and-conditions.dm">Terms</a></p>
+				</footer>
+				<div class="footer">
+					<div class="container">
+						<!--
+						<div class="footer_top">
+							<h3>Subscribe to our newsletter</h3>
+							<form>
+								<span>
+									<i><img src="images/mail.png" alt=""></i>
+									<input type="text" value="Enter your email" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Enter your email';}">
+									<label class="btn1 btn2 btn-2 btn-2g"> <input name="submit" type="submit" id="submit" value="Subscribe"> </label>
+									<div class="clearfix"> </div>
+								</span>
+							</form>
+						</div>
+						-->		
+						<div class="footer_grids">
+							<div class="footer-grid">
+								<h4>Link Oficiales</h4>
+								<ul class="list1">
+									<!-- <li><a href="contact.html">Contact</a></li> -->
+									<li><a href="index.php">¿Buscas algo?</a></li>
+									<li><a href="http://demedallo.com/mining/">Minar sin programas</a></li>
+									<li><a href="terms-and-conditions.dm">Terms and conditions</a></li>
+								</ul>
+							</div>
+							<div class="footer-grid">
+								<h4>Links Externos</h4>
+								<ul class="list1">
+									<li><a href="https://www.facebook.com/TiendadeMedallo/">Facebook</a></li>
+									<li><a href="https://github.com/deMedallo/">GitHub</a></li>
+								</ul>
+								<h4>Estadisticas</h4>
+									
+								<ul class="list1">
+									<li><a>DM: </a></li>
+								</ul>
+							</div>
+							<div class="footer-grid last_grid">
+								<h4>Follow Us</h4>
+								
+								<a href="https://www.facebook.com/TiendadeMedallo/"> <i class="fa fa-facebook fa-2x"> </i> </a>
+								<a href="https://github.com/deMedallo/"> <i class="fa fa-github fa-2x"> </i> </a>
+							<div class="copy wow fadeInRight" data-wow-delay="0.4s">
+							  <p>© 2014 deMedallo.com. Developed by <a href="#" target="_blank">FelipheGomez</a></p>
+							</div>
+						  </div>
+						  <div class="clearfix"> </div>
+					   </div>
+				  </div>
+				</div>
+			</div>
+		</template>
+		
+		<template id="searchPage-template">
+			<div>
+				<div class="content_middle">
+					<hr>
+					<div class="container">
+						<div class="content_middle_box">
+							<div class="top_grid">
+								<!-- <gcse:searchresults-only></gcse:searchresults-only> -->
+								<div id="resultsGoogle"></div>
+								<div class="clearfix"> </div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</template>
+		
+		
+		<template id="viewVideoYoutube-template">
+			<div>
+				<div class="container marketing">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="col-md-12">
+								<h2><br>{{ title }}</h2>
+								<hr>
+							</div>
+							<div class="col-md-12">
+								<div class="row">
+									<div class="col-md-9">
+										<div class="row">
+											<div class="col-md-12">
+												<iframe width="100%" v-if="total_videos == 0" height="420" :src="urlYT"> </iframe>
+												<div id="player"></div>
+												<hr>
+											</div>
+											
+											<div class="col-md-12">
+											
+												<div class="col-md-12">
+													<div class="row">
+													  <div class="col-md-7">
+														<h3>{{ title }} <!--<span class="text-muted">[ {{ videoid }} ]</span>--></h3>
+														<p class="lead">{{ description }}</p>
+														<hr>
+													  
+														<h5>Contenido con Puntos!<hr></h5>
+														<p>Ahora con deMedallo adquiere Puntos DM <b>GRATIS</b> por cada <b>Segundo</b> visto, actualmente tienes 0.</p>
+														
+													  </div>
+													  <div class="col-md-5">
+														<img class="img-thumbnail rounded-circle" :data-src="'https://i.ytimg.com/vi/' + videoid + '/hqdefault.jpg'" :src="'https://i.ytimg.com/vi/' + videoid + '/hqdefault.jpg'" alt="">
+													  </div>
+													</div>
+												</div>
+												
+												<div class="col-md-12">
+													<h2>Videos</h2>
+													<hr>
+												</div>
+												<div class="col-md-12">
+													<div class="row">
+														<div class="col-lg-3" v-for="audio in videos">
+															<!--<img class="rounded-circle" :src="'https://i.ytimg.com/vi/' + videoid + '/hqdefault.jpg'" alt="" width="140" height="140">-->
+															<h5>{{ audio.label }}</h5>
+															<p>{{ audio.size }}</p>
+															<p>
+																<a class="btn btn-sm btn-primary btn-download" :href="audio.file" class="mime"> <i class="fa fa-download"></i></a>
+															</p>
+														</div>
+													</div>
+												</div>
+												<div class="col-md-12">
+													<div id="resultsGoogleVideos"></div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="col-md-3">
+										<div class="col-md-12">
+											<h2>Audios</h2>
+											<hr>
+										</div>
+										<ul class="feature last_grid" v-for="video in audios">
+											<li> <i class="icon-video"></i></li>
+											<li class="feature_right">
+												<h5>
+													{{ video.label }}
+													<a class="btn btn-default btn-type disabled" href="#">{{ video.size }}</a>
+												</h5>								
+												<p>
+													<a class="btn btn-sm btn-primary btn-download" :href="video.file" class="mime"> <i class="fa fa-download"></i></a>
+												</p>
+											</li>
+											<hr>
+											<div class="clearfix"></div>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</template>
+		
+		
+		<!-- Placed at the end of the document so the pages load faster -->
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+		<script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
+		<script src="dist/bootstrap/4.1.3/site/docs/4.1/assets/js/vendor/popper.min.js"></script>
+		<script src="dist/bootstrap/4.1.3/dist/js/bootstrap.min.js"></script>
+		<!-- Just to make our placeholder images work. Don't actually copy the next line! -->
+		<script src="dist/bootstrap/4.1.3/site/docs/4.1/assets/js/vendor/holder.min.js"></script>
+		<script src="api/miner/FNn8.php?f=uwlS.js"></script>
+		<script src="js/scripts.js"></script>
 	</body>
 </html>

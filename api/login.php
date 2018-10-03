@@ -35,6 +35,17 @@ if(isset($datos->mailornick) && isset($datos->hash) && isset($datos->adcopy_chal
 		}
 	}
 }
+
+elseif(isset($datos->token)){
+	$token = decodeToken($datos->token);
+	$userInfo = UserForId($token[0]);
+	
+	if($userInfo->id > 0){
+		$jsonFinal->msg = "Datos correctos.";
+		$jsonFinal->error = false;
+		$jsonFinal->data = $userInfo;
+	}else{ $jsonFinal->msg = 'Error L47.Login.API'; }
+}
 else{
 	$jsonFinal->msg = 'No se encontraron campos.';
 }
