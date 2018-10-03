@@ -43,7 +43,7 @@
 					<div class="dropdown-item"><label for="password">Contraseña</label></div>
 					<div class="dropdown-item"><input class="form-control" type="password" v-model="hash" name="hash" id="password"></div>
 					<div class="dropdown-item"><label for="password">Captcha</label></div>
-					<div class="dropdown-item"><div id="acwidget-login-page"><div id="acwidget-login"><a @click="createCaptcha()">cargar CatpChat</a></div></div></div>
+					<div class="dropdown-item"><div id="acwidget-login-page"><div id="acwidget-login"><a @click="$parent.realoadCaptcha('acwidget-login-page')">Haz clic si no aparece el captcha.</a></div></div></div>
 					
 					<div class="dropdown-divider"></div>
 					<div class="alert alert-dark" role="alert" v-if="error == true">
@@ -114,8 +114,7 @@
 							</div>
 						</div>
 					</div>
-				</div>
-				
+				</div>				
 			</div>
 		</template>
 
@@ -127,29 +126,40 @@
 				<div class="dropdown-item" ><b>Referidos</b>: {{ $parent.refers }}</div>
 				
 				<div class="dropdown-divider"></div>
-				<div class="dropdown-item" href="#"><h3>Wallets</h3></div>
+				<div class="dropdown-item" href="#">
+					<h3>
+						Wallets
+						<router-link tag="a" v-bind:to="'/createWallet'" class="btn-group-vertical pull-right">
+							 <button type="button" class="btn btn-success btn-sm">
+								<i class="fa fa-plus"></i> 
+								Agregar
+							 </button>
+						</router-link>
+					</h3>
+				</div>
 			
 				<fieldset class="dropdown-item" v-for="wallet in $parent.wallets">
 					<label>{{ wallet.symbol }} - {{ wallet.name }}</label>
 					<table class="table table-responsive">
 						<tr>
-							<th colspan="2">
+							<th colspan="3">
 								Address: <router-link tag="a" colspan="2" v-bind:to="'/wallet/' + wallet.address + '/' + wallet.coin_id">{{ wallet.address }}</router-link>
 							</th>
 						</tr>
 						<tr>
 							<td v-bind:class="'wallet-' + wallet.symbol + '-balance'">{{ wallet.balance.toFixed(wallet.decimals) }}</td>
-							<td>{{ wallet.symbol }}</td>
+							<td colspan="2">{{ wallet.symbol }}</td>
 						</tr>
 						<tr>
 							<td>
 								<router-link tag="a" class="btn btn-secondary" v-bind:to="'/lastTx/' + wallet.address + '/' + wallet.coin_id">Transacciones</router-link>
 							</td>
 							<td>
-								<router-link tag="a" class="btn btn-warning disabled" v-bind:to="'#'">Exchange</router-link>
+								<router-link tag="a" class="btn btn-info disabled" v-bind:to="'/exchange/' + wallet.address + '/' + wallet.symbol">Exchange</router-link>
 							</td>
 							<td>
-								<router-link tag="a" class="btn btn-info" v-bind:to="'/sendW/' + wallet.symbol">Enviar</router-link>
+								<router-link v-if="wallet.symbol == 'DM'" tag="a" class="btn btn-info" v-bind:to="'/sendW/' + wallet.symbol">Enviar</router-link>
+								<router-link v-else="" tag="a" class="btn btn-info disabled" v-bind:to="'/withdraw/' + wallet.symbol">Retirar / Withdraw</router-link>
 							</td>
 						</tr>
 					</table>
@@ -802,6 +812,146 @@
 
 				<hr>
 				<hr>
+			</div>
+		</template>
+		
+		<template id="createWalletPage-template">
+			<div>
+				<div class="content_middle">
+					<div class="container">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="dropdown-divider"></div>								
+								<div class="panel panel-primary" style="margin:20px;">
+									<div class="panel-heading">
+										<h3 class="panel-title">Crear Nueva Wallet</h3>
+										<hr>
+									</div>
+									<div class="panel-body">
+										<form method="POST" class="form row" action="javascript:false;" @submit="submitCreateWallet">
+											<div class="col-md-6 col-sm-6">
+												<div class="form-group col-md-12 col-sm-12">
+													<label for="name">Direccion (address)*:</label>
+													<input type="text" class="form-control input-sm" name="address" v-model="address" placeholder="">
+												</div>
+												<div class="form-group col-md-12 col-sm-12">
+													<label for="name">Currency*</label>
+													
+													<select v-model="selectedCurrency" class="form-control input-sm">
+													  <option v-for="option in optionsCurrency" v-bind:value="option.value">
+														{{ option.text }}
+													  </option>
+													</select>
+													<span>Selected: {{ selectedCurrency }}</span>
+												</div>
+												<div class="form-group col-md-12 col-sm-12">
+													<label for="pincode">Terminos y condiciones</label>
+													<span class="help-block">Solo debes agregar una billetera, al agregar tu segunda billetera eliminas de manera automatica la primera.</span>
+												</div>
+											</div>
+
+											<div class="col-md-6 col-sm-6">
+												
+												<div class="form-group col-md-12 col-sm-12" >
+													<div class="dropdown-item"><div id="acwidget-register-page"><div id="acwidget-register"><a @click="$parent.realoadCaptcha('acwidget-register')">cargar CatpChat</a></div></div></div>
+												</div>
+												
+												<div class="form-group col-md-12 col-sm-12" >
+													<div class="alert alert-dark" role="alert" v-if="error == true">
+													  {{ message }}
+													</div>
+													<div class="dropdown-divider"></div>
+												</div>
+												
+												<div class="form-group col-md-12 col-sm-12">
+													<label for="pincode">Terminos y condiciones</label>
+													<span class="help-block">
+														Para cambiar su SYMBOL use LINKS. 
+														Puede ordenar el pago cuando su cuenta alcance MINPAGO WEB, también deducimos la tarifa de red: FEE SYMBOL.
+													</span>
+												</div>
+												
+												<div class="form-group col-md-12 col-sm-12 pull-right" >
+													<input type="submit" class="btn btn-primary" value="Crear mi cuenta"/>
+												</div>
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</template>
+		
+		<template id="exchangePage-template">
+			<div>
+				<div class="content_middle">
+					<div class="container">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="dropdown-divider"></div>								
+								<div class="panel panel-primary" style="margin:20px;">
+									<div class="panel-heading">
+										<h3 class="panel-title">Crear Nueva Wallet</h3>
+										<hr>
+									</div>
+									<div class="panel-body">
+										<form method="POST" class="form row" action="javascript:false;" @submit="submitCreateWallet">
+											<div class="col-md-6 col-sm-6">
+												<div class="form-group col-md-12 col-sm-12">
+													<label for="name">Direccion (address)*:</label>
+													<input type="text" class="form-control input-sm" name="address" v-model="address" placeholder="">
+												</div>
+												<div class="form-group col-md-12 col-sm-12">
+													<label for="name">Currency*</label>
+													
+													<select v-model="selectedCurrency" class="form-control input-sm">
+													  <option v-for="option in optionsCurrency" v-bind:value="option.value">
+														{{ option.text }}
+													  </option>
+													</select>
+													<span>Selected: {{ selectedCurrency }}</span>
+												</div>
+												<div class="form-group col-md-12 col-sm-12">
+													<label for="pincode">Terminos y condiciones</label>
+													<span class="help-block">Solo debes agregar una billetera, al agregar tu segunda billetera eliminas de manera automatica la primera.</span>
+												</div>
+											</div>
+
+											<div class="col-md-6 col-sm-6">
+												
+												<div class="form-group col-md-12 col-sm-12" >
+													<div class="dropdown-item"><div id="acwidget-register-page"><div id="acwidget-register"><a @click="$parent.realoadCaptcha('acwidget-register')">cargar CatpChat</a></div></div></div>
+												</div>
+												
+												<div class="form-group col-md-12 col-sm-12" >
+													<div class="alert alert-dark" role="alert" v-if="error == true">
+													  {{ message }}
+													</div>
+													<div class="dropdown-divider"></div>
+												</div>
+												
+												<div class="form-group col-md-12 col-sm-12">
+													<label for="pincode">Terminos y condiciones</label>
+													<span class="help-block">
+														Para cambiar su SYMBOL use LINKS. 
+														Puede ordenar el pago cuando su cuenta alcance MINPAGO WEB, también deducimos la tarifa de red: FEE SYMBOL.
+													</span>
+												</div>
+												
+												<div class="form-group col-md-12 col-sm-12 pull-right" >
+													<input type="submit" class="btn btn-primary" value="Crear mi cuenta"/>
+												</div>
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</template>
 		

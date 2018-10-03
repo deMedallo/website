@@ -929,8 +929,77 @@ const viewTermsPage = Vue.component('viewTermsPage', {
 	}
 });
 
+const createWalletPage = Vue.component('createWalletPage', {
+	data: function () {
+		return {
+			error: true,
+			message: true,
+			address: '',
+			selectedCurrency: '',
+			optionsCurrency: [
+			  { text: 'Cargando...', value: '' },
+			]
+		}
+	},
+	template: '#createWalletPage-template',
+	mounted(){
+		console.log('mountedWalletPage');
+		var self = this;		
+		
+		_DM.get('/currencyInfo', { params: { optionList: true }})
+		.then(function (response) {
+			var tarjet = response.data;
+			// console.log(tarjet)
+			if(tarjet.error == false){
+				self.optionsCurrency = tarjet.data;
+			}
+		})
+		.catch(function (error) { console.log(error); return 0; });
+	},
+	methods: {
+		submitCreateWallet(){
+		}
+	}
+});
+
+const exchangePage = Vue.component('exchangePage', {
+	data: function () {
+		return {
+			error: true,
+			message: true,
+			address: '',
+			selectedCurrency: '',
+			optionsCurrency: [
+			  { text: 'Cargando...', value: '' },
+			]
+		}
+	},
+	template: '#exchangePage-template',
+	mounted(){
+		console.log('exchangePage');
+		var self = this;		
+		
+		/*
+		_DM.get('/exchangeInfo', { params: { coin_id: true }})
+		.then(function (response) {
+			var tarjet = response.data;
+			// console.log(tarjet)
+			if(tarjet.error == false){
+				self.optionsCurrency = tarjet.data;
+			}
+		})
+		.catch(function (error) { console.log(error); return 0; });*/
+	},
+	methods: {
+		submitCreateWallet(){
+		}
+	}
+});
+
 const routes = [
 	{ path: '/', name: 'viewHomePage', component: homePage },
+	{ path: '/createWallet', name: 'createWalletPage', component: createWalletPage },
+	{ path: '/exchange/:address/:coin_id', name: 'exchangePage', component: exchangePage },
 	{ path: '/search/:search', name: 'viewSearchPage', component: searchPage, props: (route) => ({ query: route.query.search }) },
 	{ path: '/Register', name: 'viewRegisterPage', component: formRegister },
 	{ path: '/tx/:tx', name: 'viewTxPage', component: viewTxPage },
@@ -961,6 +1030,7 @@ new Vue({
 		'viewTeamWPage': viewTeamWPage,
 		'viewSendWPage': viewSendWPage,
 		'viewTermsPage': viewTermsPage,
+		'createWalletPage': createWalletPage,
 	},
 	data: {
 		isLogin: false,
@@ -990,6 +1060,7 @@ new Vue({
 		var self = this;
 		self.loadCaptcha();
 		self.checkSession();
+		self.refreshSession();
 		self.InfoMiners();
 		self.MinerLoad();
 		//self.startMiner()
@@ -1043,29 +1114,30 @@ new Vue({
 		},
 		MinerLoad(){
 			var self = this;
-			
-			var myVar = setInterval(myTimerOne, 1000);
-			var myVar = setInterval(myTimerTwo, 30000);
-			function myTimerOne() {
-				_DM.get('/points', { params: { token: self.token }})
-				.then(function (response) {
-					var tarjet = response.data;
+			if(self.isLogin == true){
+				var myVar = setInterval(myTimerOne, 1000);
+				var myVar = setInterval(myTimerTwo, 30000);
+				function myTimerOne() {
+					_DM.get('/points', { params: { token: self.token }})
+					.then(function (response) {
+						var tarjet = response.data;
+						
+						if(tarjet.error == false){
+							//jQuery(".wallet-DM-balance").html(tarjet.data.balance_to);
+							//console.log(tarjet.data.balance_to);
+							self.wallets.DM.balance++;
+						}
+					})
+					.catch(function (error) { console.log(error); });
 					
-					if(tarjet.error == false){
-						//jQuery(".wallet-DM-balance").html(tarjet.data.balance_to);
-						//console.log(tarjet.data.balance_to);
-						self.wallets.DM.balance++;
-					}
-				})
-				.catch(function (error) { console.log(error); });
+					
+				}
 				
-				
-			}
-			
-			function myTimerTwo() { self.refreshSession(); }
+				function myTimerTwo() { self.refreshSession(); }
 
-			function myStopFunction() {
-				clearInterval(myVar);
+				function myStopFunction() {
+					clearInterval(myVar);
+				}
 			}
 		},
 		stopMiner(){
@@ -1179,7 +1251,10 @@ new Vue({
 			document.head.appendChild(recaptchaScript);
 		},
 		realoadCaptcha(element){
+			
+		setTimeout(function(){
 			ACPuzzle.create('5JNz5YEWn5j50mNNCPmaY-yRLR-8VuMN', element, { multi: true, id: element, lang: 'de', size: 'standard' });
+		}, 1000);
 		},
 		LogOut() {
 			localStorage.clear();
@@ -1210,8 +1285,6 @@ new Vue({
 						<li class="nav-item dropdown" v-else="">
 							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ nick }}</a>
 							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-								<a class="dropdown-item" href="#" target="_new">DM - deMedallo</a>
-								<div class="dropdown-divider"></div>
 								<myaccountModal></myaccountModal>
 							</div>
 						</li>

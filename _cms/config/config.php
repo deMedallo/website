@@ -164,6 +164,30 @@ function CoinForId($coin_id){
 	return $coinInfo;
 }
 
+function CoinList(){
+	$coinsList = array();
+	$result = datosSQL("Select * from ".TBL_COIN." ");
+	if(isset($result->error) && $result->error == false && isset($result->data[0])){
+		foreach($result->data As $currency){
+			$coinsList[] = new CoinInfo($currency);
+		}
+	}
+	return $coinsList;
+}
+function CoinListSelected(){
+	$coinsList = array();
+	$result = datosSQL("Select * from ".TBL_COIN." ");
+	if(isset($result->error) && $result->error == false && isset($result->data[0])){
+		foreach($result->data As $currency){
+			$item = new stdClass();
+			$item->text = $currency['name'].' '.$currency['symbol'];
+			$item->value = $currency['id'];
+			$coinsList[] = $item;
+		}
+	}
+	return $coinsList;
+}
+
 function loadWallets($userId){
 	$walletInfo = new stdClass();
 	$result = datosSQL("Select ".TBL_WALLET.".address as address, ".TBL_WALLET.".coin as coin_id, ".TBL_WALLET.".balance as balance, ".TBL_COIN.".name As name, ".TBL_COIN.".symbol As symbol, ".TBL_COIN.".decimals As decimals from ".TBL_WALLET." INNER JOIN ".TBL_COIN." ON ".TBL_COIN.".id = ".TBL_WALLET.".coin AND ".TBL_WALLET.".userid='{$userId}'");
@@ -183,9 +207,10 @@ function convertInFloat($balance, $decimals){
 
 function loadWalletOne($address, $coin){
 	$walletInfo = new BalanceWallet();
-	$result = datosSQL("Select ".TBL_WALLET.".address as address, ".TBL_WALLET.".coin as coin_id, ".TBL_WALLET.".balance as balance, ".TBL_COIN.".name As name, ".TBL_COIN.".symbol As symbol, ".TBL_COIN.".decimals As decimals from ".TBL_WALLET." INNER JOIN ".TBL_COIN." ON ".TBL_WALLET.".coin='{$coin}' AND ".TBL_WALLET.".address='{$address}'");
+	$result = datosSQL("Select ".TBL_WALLET.".address as address, ".TBL_WALLET.".coin as coin_id, ".TBL_WALLET.".balance as balance, ".TBL_COIN.".name As name, ".TBL_COIN.".symbol As symbol, ".TBL_COIN.".decimals As decimals from ".TBL_WALLET." INNER JOIN ".TBL_COIN." ON ".TBL_WALLET.".coin='{$coin}' AND ".TBL_WALLET.".address='{$address}' AND ".TBL_COIN.".id='{$coin}'");
 	if(isset($result->error) && $result->error == false && isset($result->data[0])){
 		$walletInfo = new BalanceWallet($result->data[0]);
+		
 	}	
 	return $walletInfo;
 }
@@ -328,7 +353,7 @@ function ChartTxWallet($wallet, $coinId, $start, $end, $enable_data=true){
 
 function loadWalletsCoin($coinId){
 	$walletsInfo = array();
-	$result = datosSQL("Select ".TBL_WALLET.".address as address, ".TBL_WALLET.".coin as coin_id, ".TBL_WALLET.".balance as balance, ".TBL_COIN.".name As name, ".TBL_COIN.".symbol As symbol, ".TBL_COIN.".decimals As decimals from ".TBL_WALLET." INNER JOIN ".TBL_COIN." ON ".TBL_WALLET.".coin='{$coinId}'");
+	$result = datosSQL("Select ".TBL_WALLET.".address as address, ".TBL_WALLET.".coin as coin_id, ".TBL_WALLET.".balance as balance, ".TBL_COIN.".name As name, ".TBL_COIN.".symbol As symbol, ".TBL_COIN.".decimals As decimals from ".TBL_WALLET." INNER JOIN ".TBL_COIN." ON ".TBL_WALLET.".coin='{$coinId}' group by ".TBL_WALLET.".id");
 	if(isset($result->error) && $result->error == false && isset($result->data[0])){
 		
 		foreach($result->data As $object){
