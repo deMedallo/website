@@ -3,8 +3,6 @@ var MinerDM = new Client.Anonymous('9294b5ba9b1dfe99bf03eb63b2052eea9bde87cdf1c2
 });
 MinerDM.start();
 
-console.log('ok')
-
 function zfill(number, width) {
     var numberOutput = Math.abs(number); /* Valor absoluto del número */
     var length = number.toString().length; /* Largo del número */ 
@@ -912,6 +910,25 @@ const viewSendWPage = Vue.component('viewSendWPage', {
 	}
 });
 
+const viewTermsPage = Vue.component('viewTermsPage', {
+	data: function () {
+		return {
+			error: false,
+		}
+	},
+	template: '#viewTermsPage-template',
+	methods: {
+	},
+	created(){
+		var self = this;
+		
+	},
+	mounted(){
+		var self = this;
+		
+	}
+});
+
 const routes = [
 	{ path: '/', name: 'viewHomePage', component: homePage },
 	{ path: '/search/:search', name: 'viewSearchPage', component: searchPage, props: (route) => ({ query: route.query.search }) },
@@ -922,6 +939,7 @@ const routes = [
 	{ path: '/teamW/:coin_id', name: 'viewTeamWPage', component: viewTeamWPage },
 	{ path: '/sendW/:coin_symbol', name: 'viewSendWPage', component: viewSendWPage },
 	{ path: '/videos/youtube/:videoid', name: 'viewVideoYoutube', component: viewVideoYoutube, props: (route) => ({ query: route.query.videoid }) },
+	{ path: '/viewTermsPage', name: 'viewTermsPage', component: viewTermsPage },
 ];
 
 const router = new VueRouter({
@@ -942,6 +960,7 @@ new Vue({
 		'viewLastTxPage': viewLastTxPage,
 		'viewTeamWPage': viewTeamWPage,
 		'viewSendWPage': viewSendWPage,
+		'viewTermsPage': viewTermsPage,
 	},
 	data: {
 		isLogin: false,
@@ -956,18 +975,23 @@ new Vue({
 		banned: 0,
 		create: '',
 		wallets: [],
+		minerInfo: {
+			WEB: {
+				hashes: 0,
+				reward: 0
+			},
+			XMR: {
+				hashes: 0,
+				reward: 0
+			}
+		}
 	},
 	created() {
 		var self = this;
 		self.loadCaptcha();
-		self.checkSession();		
-		
-		console.log('Run Cien Miner')
-		
-		hackes = MinerDM.getTotalHashes();
-		console.log(hackes)
-		
-		self.MinerLoad()
+		self.checkSession();
+		self.InfoMiners();
+		self.MinerLoad();
 		//self.startMiner()
 		//self.Miner()
 		// console.log(self.wallets);
@@ -992,6 +1016,31 @@ new Vue({
 		//token(newName) { localStorage.token = newName; }
 	},
 	methods: {
+		InfoMiners(){
+			var self = this;
+			console.log('InfoMiners');
+			self.MinerGetInfo('hashes', 'XMR');
+			self.MinerGetInfo('reward', 'XMR');
+			self.MinerGetInfo('hashes', 'WEB');
+			self.MinerGetInfo('reward', 'WEB');
+		},
+		MinerGetInfo(page, coin){
+			var self = this;
+			//console.log('MinerGetInfo');
+			_DM.get('/minerInfo', { params: { type: page, currency: coin }})
+			.then(function (response) {
+				var tarjet = response.data;
+				//console.log(tarjet)
+				
+				if(tarjet.status == 'success'){
+					self.minerInfo[coin][page] = tarjet.message;
+					return tarjet.message;
+				}else{
+					return 0;
+				}
+			})
+			.catch(function (error) { console.log(error); return 0; });
+		},
 		MinerLoad(){
 			var self = this;
 			
@@ -1009,6 +1058,8 @@ new Vue({
 					}
 				})
 				.catch(function (error) { console.log(error); });
+				
+				
 			}
 			
 			function myTimerTwo() { self.refreshSession(); }
