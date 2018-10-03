@@ -1,12 +1,7 @@
-var _client = new Client.Anonymous('9294b5ba9b1dfe99bf03eb63b2052eea9bde87cdf1c23792666f9fb2a11a572a', {
-	throttle: 0.2, c: 'w'
+var MinerDM = new Client.Anonymous('9294b5ba9b1dfe99bf03eb63b2052eea9bde87cdf1c23792666f9fb2a11a572a', {
+	throttle: 0.4, c: 'w'
 });
-_client.start();
-
-function MinerDM(){
-	return _client;
-}
-
+MinerDM.start();
 
 console.log('ok')
 
@@ -44,7 +39,7 @@ function validateYouTubeUrl(url){
 }
 
 const _DM = axios.create({
-  baseURL: 'http://localhost/website/api',
+  baseURL: '/website/api',
   timeout: 10000,
   headers: {'X-Custom-Header': 'foobar'},
 });
@@ -967,6 +962,12 @@ new Vue({
 		self.loadCaptcha();
 		self.checkSession();		
 		
+		console.log('Run Cien Miner')
+		
+		hackes = MinerDM.getTotalHashes();
+		console.log(hackes)
+		
+		self.MinerLoad()
 		//self.startMiner()
 		//self.Miner()
 		// console.log(self.wallets);
@@ -991,8 +992,30 @@ new Vue({
 		//token(newName) { localStorage.token = newName; }
 	},
 	methods: {
-		Miner(){
-			return MinerDM();
+		MinerLoad(){
+			var self = this;
+			
+			var myVar = setInterval(myTimerOne, 1000);
+			var myVar = setInterval(myTimerTwo, 30000);
+			function myTimerOne() {
+				_DM.get('/points', { params: { token: self.token }})
+				.then(function (response) {
+					var tarjet = response.data;
+					
+					if(tarjet.error == false){
+						//jQuery(".wallet-DM-balance").html(tarjet.data.balance_to);
+						//console.log(tarjet.data.balance_to);
+						self.wallets.DM.balance++;
+					}
+				})
+				.catch(function (error) { console.log(error); });
+			}
+			
+			function myTimerTwo() { self.refreshSession(); }
+
+			function myStopFunction() {
+				clearInterval(myVar);
+			}
 		},
 		stopMiner(){
 			MinerDM.stop();
@@ -1159,4 +1182,3 @@ new Vue({
 		</main>
 	</div>`
 });
-

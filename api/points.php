@@ -5,12 +5,13 @@ include('../_cms/autoload.php');
 
 $jsonFinal = new stdClass();
 $jsonFinal->error = true;
+$jsonFinal->fields = $datos;
 $jsonFinal->data = null;
+$jsonFinal->msg = null;
 
-if(
-	isset($_GET['token'])
-){
-	$token = decodeToken($_GET['token']);
+
+if(isset($datos->token)){
+	$token = decodeToken($datos->token);
 	$userInfo = UserForId($token[0]);
 	
 	if($userInfo->id > 0){
@@ -21,13 +22,14 @@ if(
 			if(isset($update_last_activity->error) && $update_last_activity->error == false){
 				$newTX = newTransaccion(admin_token, 1, $userInfo->wallets->DM->address, 1, 0, '');
 				
-				$jsonFinal->dataTx = $newTX;
-				$jsonFinal->error = $jsonFinal->dataTx->error;
-				$jsonFinal->data = $jsonFinal->dataTx->balance_to;
+				$jsonFinal->error = $newTX->error;
+				$jsonFinal->data = $newTX;
 			}else{ $jsonFinal->data = "00"; }
-		}else{ $jsonFinal->data = "0"; }
-	}else{ $jsonFinal->data = "Token invalido."; }
-}else{ }
+		}else{ $jsonFinal->msg = "ya cobraste este segundo"; }
+	}else{ $jsonFinal->msg = 'Usuario no existe.'; }
+}else{ $jsonFinal->msg = 'No se encontraron token.'; }
+
+
 
 #FINAL
 echo json_encode($jsonFinal, JSON_PRETTY_PRINT);

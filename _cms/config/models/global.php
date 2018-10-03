@@ -10,8 +10,6 @@ Class VideoInfo{
 	var $audios = array();
 	var $total_audios = 0;
 	var $tags = array();
-	#var $mp3_download_url = '';
-	#var $mp3_download_quality = '';
 	
 	function __construct($args=array()) {
 		if(isset($args['videoid'])){ $this->id = (string) $args['videoid']; }
@@ -20,8 +18,6 @@ Class VideoInfo{
 		if(isset($args['thumbnail'])){ $this->thumbnail = (string) $args['thumbnail']; }	
 		if(isset($args['videos'])){ $this->videos = (array) $args['videos']; }
 		$this->total_videos = count($this->videos);
-		#if(isset($args['mp3_download_url'])){ $this->mp3_download_url = (string) $args['mp3_download_url']; }	
-		#if(isset($args['mp3_download_quality'])){ $this->mp3_download_quality = (string) $args['mp3_download_quality']; }	
 	}
 }
 
