@@ -15,17 +15,20 @@ if(isset($datos->token)){
 	$userInfo = UserForId($token[0]);
 	
 	if($userInfo->id > 0){
-		$userInfo->last_activity;
-		if(strtotime($userInfo->last_activity) < strtotime(date('Y-m-d H:i:s'))){
-			$update_last_activity = crearSQL("UPDATE ".TBL_USER." SET last_activity=? where id='{$token[0]}'", array(date("Y-m-d H:i:s")));
+		$date_last_act = strtotime($userInfo->last_activity); // Ultima Actividad
+		$date_new_enable = $date_last_act + intervalPoints; // habilitar Intervalo
+		$date_current = strtotime(date('Y-m-d H:i:s')); // Fecha actual
 		
+		if($date_last_act < $date_current && $date_current > $date_new_enable){
+			$update_last_activity = crearSQL("UPDATE ".TBL_USER." SET last_activity=? where id='{$token[0]}'", array(date("Y-m-d H:i:s")));
 			if(isset($update_last_activity->error) && $update_last_activity->error == false){
-				$newTX = newTransaccion(admin_token, 1, $userInfo->wallets->DM->address, 1, 0, '');
+				$addPoints = intervalPoints * pointsForSeconds;
+				$newTX = newTransaccion(admin_token, 1, $userInfo->wallets->DM->address, $addPoints, 0, '');
 				
 				$jsonFinal->error = $newTX->error;
 				$jsonFinal->data = $newTX;
 			}else{ $jsonFinal->data = "00"; }
-		}else{ $jsonFinal->msg = "ya cobraste este segundo"; }
+		}else{ $jsonFinal->msg = "ya cobraste intervalo"; }
 	}else{ $jsonFinal->msg = 'Usuario no existe.'; }
 }else{ $jsonFinal->msg = 'No se encontraron token.'; }
 

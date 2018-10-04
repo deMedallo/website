@@ -152,10 +152,15 @@
 						</tr>
 						<tr>
 							<td>
+								<a @click="removeWallet(wallet.coin_id)" class="btn-group-vertical" v-if="wallet.symbol != 'DM'">
+									 <button type="button" class="btn btn-danger btn-sm">
+										<i class="fa fa-remove"></i> 
+									 </button>
+								</a>
 								<router-link tag="a" class="btn btn-secondary" v-bind:to="'/lastTx/' + wallet.address + '/' + wallet.coin_id">Transacciones</router-link>
 							</td>
 							<td>
-								<router-link tag="a" class="btn btn-info disabled" v-bind:to="'/exchange/' + wallet.address + '/' + wallet.symbol">Exchange</router-link>
+								<router-link tag="a" class="btn btn-info" v-bind:to="'/exchange/' + wallet.address + '/' + wallet.symbol">Convertir</router-link>
 							</td>
 							<td>
 								<router-link v-if="wallet.symbol == 'DM'" tag="a" class="btn btn-info" v-bind:to="'/sendW/' + wallet.symbol">Enviar</router-link>
@@ -824,7 +829,7 @@
 								<div class="dropdown-divider"></div>								
 								<div class="panel panel-primary" style="margin:20px;">
 									<div class="panel-heading">
-										<h3 class="panel-title">Crear Nueva Wallet</h3>
+										<h1 class="panel-title">Crear Nueva Wallet</h1>
 										<hr>
 									</div>
 									<div class="panel-body">
@@ -844,20 +849,16 @@
 													</select>
 													<span>Selected: {{ selectedCurrency }}</span>
 												</div>
-												<div class="form-group col-md-12 col-sm-12">
-													<label for="pincode">Terminos y condiciones</label>
-													<span class="help-block">Solo debes agregar una billetera, al agregar tu segunda billetera eliminas de manera automatica la primera.</span>
-												</div>
 											</div>
 
 											<div class="col-md-6 col-sm-6">
 												
 												<div class="form-group col-md-12 col-sm-12" >
-													<div class="dropdown-item"><div id="acwidget-register-page"><div id="acwidget-register"><a @click="$parent.realoadCaptcha('acwidget-register')">cargar CatpChat</a></div></div></div>
+													<div class="dropdown-item"><div id="acwidget-newWallet-page"><div id="acwidget-newWallet"><a @click="$parent.realoadCaptcha('acwidget-newWallet')">cargar CatpChat</a></div></div></div>
 												</div>
 												
 												<div class="form-group col-md-12 col-sm-12" >
-													<div class="alert alert-dark" role="alert" v-if="error == true">
+													<div class="alert alert-dark" role="alert" v-if="message != ''">
 													  {{ message }}
 													</div>
 													<div class="dropdown-divider"></div>
@@ -865,14 +866,20 @@
 												
 												<div class="form-group col-md-12 col-sm-12">
 													<label for="pincode">Terminos y condiciones</label>
+													<span class="help-block">Solo debes agregar una billetera, al agregar tu segunda billetera eliminas de manera automatica la primera.</span>
+												</div>
+												
+												<!--												
+												<div class="form-group col-md-12 col-sm-12">
+													<label for="pincode"><b>Impotanta: </b></label>
 													<span class="help-block">
 														Para cambiar su SYMBOL use LINKS. 
 														Puede ordenar el pago cuando su cuenta alcance MINPAGO WEB, también deducimos la tarifa de red: FEE SYMBOL.
 													</span>
-												</div>
+												</div>-->
 												
 												<div class="form-group col-md-12 col-sm-12 pull-right" >
-													<input type="submit" class="btn btn-primary" value="Crear mi cuenta"/>
+													<input type="submit" class="btn btn-primary" value="Agregar"/>
 												</div>
 											</div>
 										</form>
@@ -894,58 +901,75 @@
 								<div class="dropdown-divider"></div>								
 								<div class="panel panel-primary" style="margin:20px;">
 									<div class="panel-heading">
-										<h3 class="panel-title">Crear Nueva Wallet</h3>
+										<h1 class="panel-title">Convertir: {{ coinFrom }}</h1>
 										<hr>
 									</div>
 									<div class="panel-body">
-										<form method="POST" class="form row" action="javascript:false;" @submit="submitCreateWallet">
-											<div class="col-md-6 col-sm-6">
-												<div class="form-group col-md-12 col-sm-12">
-													<label for="name">Direccion (address)*:</label>
-													<input type="text" class="form-control input-sm" name="address" v-model="address" placeholder="">
-												</div>
-												<div class="form-group col-md-12 col-sm-12">
-													<label for="name">Currency*</label>
-													
-													<select v-model="selectedCurrency" class="form-control input-sm">
-													  <option v-for="option in optionsCurrency" v-bind:value="option.value">
-														{{ option.text }}
-													  </option>
-													</select>
-													<span>Selected: {{ selectedCurrency }}</span>
-												</div>
-												<div class="form-group col-md-12 col-sm-12">
-													<label for="pincode">Terminos y condiciones</label>
-													<span class="help-block">Solo debes agregar una billetera, al agregar tu segunda billetera eliminas de manera automatica la primera.</span>
-												</div>
+										<div class="row">
+											<div class="col-md-12">
+												<h4>IMPORTANTE</h4>
+												<p>
+													<ul>
+														<li>No hay cuota para la conversión</li>
+														<li>La tasa de conversión que se muestra a continuación es la tasa ACTUAL; es probable que fluctúe durante el día.</li>
+														<li>La conversión se hará al instante. La cantidad especificada se cargará de su bote y la cantidad convertida se acreditará a su otra olla de monedas de inmediato.</li>
+														<li>Las conversiones no se pueden cancelar ni anular una vez que están completas</li>
+													</ul>
+												</p>
+												
+												<hr>
 											</div>
-
-											<div class="col-md-6 col-sm-6">
-												
-												<div class="form-group col-md-12 col-sm-12" >
-													<div class="dropdown-item"><div id="acwidget-register-page"><div id="acwidget-register"><a @click="$parent.realoadCaptcha('acwidget-register')">cargar CatpChat</a></div></div></div>
-												</div>
-												
-												<div class="form-group col-md-12 col-sm-12" >
-													<div class="alert alert-dark" role="alert" v-if="error == true">
-													  {{ message }}
+											<div class="col-md-12">
+												<form method="POST" class="form row" action="javascript:false;" @submit="submitConvert">
+													<div class="col-md-6 col-sm-6">
+														<div class="form-group col-md-12 col-sm-12">
+															<label for="name">Convert to*</label>
+															
+															<select v-model="coinTo" class="form-control input-sm" @change="calculateRate">
+															  <option v-for="option in optionsCurrency" v-bind:value="option.symbol">
+																{{ option.text }}
+															  </option>
+															</select>
+															<span>Selected: {{ coinTo }}</span>
+														</div>
+														<div class="form-group col-md-12 col-sm-12">
+															<label for="name">Conversion rate</label>
+															<input type="text" class="form-control input-sm" readonly="" name="conversionRate" v-model="conversionRate" placeholder="">
+														</div>
+														<div class="form-group col-md-12 col-sm-12">
+															<label for="name">Amount to convert</label>
+															<input type="text" class="form-control input-sm" @change="calculateAmountRecibe" name="amountConvert" v-model="amountConvert" placeholder="">
+														</div>
+														<div class="form-group col-md-12 col-sm-12">
+															<label for="name">Amount you will receive</label>
+															<input type="text" class="form-control input-sm" readonly="" name="amountRecibe" v-model="amountRecibe" placeholder="">
+														</div>
 													</div>
-													<div class="dropdown-divider"></div>
-												</div>
-												
-												<div class="form-group col-md-12 col-sm-12">
-													<label for="pincode">Terminos y condiciones</label>
-													<span class="help-block">
-														Para cambiar su SYMBOL use LINKS. 
-														Puede ordenar el pago cuando su cuenta alcance MINPAGO WEB, también deducimos la tarifa de red: FEE SYMBOL.
-													</span>
-												</div>
-												
-												<div class="form-group col-md-12 col-sm-12 pull-right" >
-													<input type="submit" class="btn btn-primary" value="Crear mi cuenta"/>
-												</div>
+
+													<div class="col-md-6 col-sm-6">
+														
+														<div class="form-group col-md-12 col-sm-12" >
+															<div class="dropdown-item"><div id="acwidget-convert-page"><div id="acwidget-convert"><a @click="$parent.realoadCaptcha('acwidget-convert')">cargar CatpChat</a></div></div></div>
+														</div>
+														
+														<div class="form-group col-md-12 col-sm-12" v-if="message != ''">
+															<div class="alert alert-dark" role="alert" >
+															  {{ message }}
+															</div>
+															<div class="dropdown-divider"></div>
+														</div>
+														<div class="form-group col-md-12 col-sm-12">
+															<label for="pincode"></label>
+															<span class="help-block"></span>
+														</div>
+														
+														<div class="form-group col-md-12 col-sm-12 pull-right" >
+															<input type="submit" class="btn btn-primary" value="Cambiar"/>
+														</div>
+													</div>
+												</form>
 											</div>
-										</form>
+										</div>
 									</div>
 								</div>
 							</div>

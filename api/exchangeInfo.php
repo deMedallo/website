@@ -9,10 +9,20 @@ $jsonFinal->fields = $datos;
 $jsonFinal->data = null;
 $jsonFinal->msg = null;
 
-if(isset($datos->coin_id)){
-	$coinInfo = CoinForId($datos->coin_id);
-	$jsonFinal->data = $coinInfo;
+
+if(isset($datos->coinFrom) && isset($datos->coinTo)){
+	$coinFrom = CoinForSymbol($datos->coinFrom);
+	if($coinFrom->id > 0){
+		$coinFrom->coinTo = '';
+		$jsonFinal->data = rateCurrency($datos->coinFrom, $datos->coinTo);
+	}else{
+		$jsonFinal->msg = 'una de las monedas no esta permitida.';
+	}
 }
+
+
+
+
 
 #FINAL
 echo json_encode($jsonFinal, JSON_PRETTY_PRINT);

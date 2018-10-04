@@ -45,6 +45,10 @@ define('TBL_WALLET', 'wallets'); // tabla de
 define('TBL_TRANSACTION', 'transactions'); // tabla de 
 
 
+# Definir Intervalos API Points
+define('intervalPoints', 20); // Segundos
+define('pointsForSeconds', 1); // Puntos X Segundo
+
 ### DEFINIR CUENTA PRINCIPAL
 define('admin_address', '0x4b9987ccafacb8d8fc08d22bbca797ba'); // Address Site Admin
 define('admin_token', 'MTphZG1pbjpjYWMyYWQ1ZTU3NzQ4ZDg3NDgwNzJlZTU5ZWQzMTRmMA=='); // Address Site Admin
@@ -154,6 +158,16 @@ function UserForId($userId){
 	return $userInfo;
 }
 
+# Cargar moneda por Symbol
+function CoinForSymbol($coin_symbol){
+	$coinInfo = new CoinInfo();
+	$result = datosSQL("Select * from ".TBL_COIN." where symbol='{$coin_symbol}' ");
+	if(isset($result->error) && $result->error == false && isset($result->data[0])){
+		$coinInfo = new CoinInfo($result->data[0]);
+	}
+	return $coinInfo;
+}
+
 # Cargar moneda por ID
 function CoinForId($coin_id){
 	$coinInfo = new CoinInfo();
@@ -180,8 +194,9 @@ function CoinListSelected(){
 	if(isset($result->error) && $result->error == false && isset($result->data[0])){
 		foreach($result->data As $currency){
 			$item = new stdClass();
-			$item->text = $currency['name'].' '.$currency['symbol'];
+			$item->text = $currency['symbol'].' - '.$currency['name'];
 			$item->value = $currency['id'];
+			$item->symbol = $currency['symbol'];
 			$coinsList[] = $item;
 		}
 	}
@@ -268,7 +283,7 @@ function newTransaccion($token, $coinId, $to, $value=0, $fee=0, $data=''){
 					$update_balace_to = crearSQL("UPDATE ".TBL_WALLET." SET balance=? WHERE address='{$sendr->to}' AND coin='{$coin->id}' ",array(
 						$new_balance_to
 					));
-					if(isset($update_balace_to->error) && $update_balace_to->error == false){				
+					if(isset($update_balace_to->error) && $update_balace_to->error == false){
 						$sendr->balance_to = $new_balance_to;
 						$create = crearSQL("INSERT INTO ".TBL_TRANSACTION." ( `tx`, `from`, `to`, `value`, `fee`, `data`, `coin` ) VALUES (?,?,?,?,?,?,?)",array(
 							$sendr->tx
@@ -393,6 +408,38 @@ function totalRecibeWallet($address, $coin_id=0){
 	return $r;
 }
 
+function rateCurrency($coinFrom, $coinTo){
+	$r = 0;
+	# LISTADO COMPLETO
+	# https://api.coinmarketcap.com/v2/listings/
+	
+	$coin1 = 0;
+	$coin2 = $coinTo;
+	if($coinFrom == 'WEB' || $coinFrom == 'DM'){ $coin1 = 3361; }
+	else if($coinFrom == 'XMR'){ $coin1 = 328; }
+	
+	
+	if($coinTo == 'DM'){ $coin2 = 'WEB'; }
+	
+	
+	
+	$url_datosDM = "https://api.coinmarketcap.com/v2/ticker/{$coin1}/?convert={$coin2}";
+	$datosDM = json_decode(@file_get_contents($url_datosDM));
+
+
+	if($coinFrom == 'DM'){
+		$datosDM->data->quotes->{$coin2}->price = (float) $datosDM->data->quotes->{$coin2}->price / (1000000);	
+	}
+	if($coinTo == 'DM'){
+		$datosDM->data->quotes->{$coin2}->price = (float) $datosDM->data->quotes->{$coin2}->price * (1000000);	
+	}
+	
+	
+	if(isset($datosDM->data->quotes->{$coin2}->price)){
+		$r = $datosDM->data->quotes->{$coin2}->price;
+	}
+	return $r;
+}
 
 
 class WalletValidator

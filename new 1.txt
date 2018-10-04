@@ -1,0 +1,33 @@
+https://api.coinmarketcap.com/v2/listings/
+
+
+# WebChain
+https://api.coinmarketcap.com/v2/ticker/3361/?convert=USD
+
+
+DOGE
+https://api.coinmarketcap.com/v2/ticker/74/?convert=BTC
+
+
+
+
+DM (WebChain E-8)
+Convert to [currency]
+Conversion rate:
+https://api.coinmarketcap.com/v2/ticker/3361/?convert=COP
+
+Amount to convert: 1 WEB
+DM: 
+
+0
+Amount you will receive
+BTC
+
+0.00000000
+Convert maximum amount
+
+
+
+
+1 WEB = 100000
+1 DIA = 86400

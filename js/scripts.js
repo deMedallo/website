@@ -38,7 +38,7 @@ function validateYouTubeUrl(url){
 
 const _DM = axios.create({
   baseURL: '/website/api',
-  timeout: 10000,
+  timeout: 15000,
   headers: {'X-Custom-Header': 'foobar'},
 });
 
@@ -121,16 +121,7 @@ const viewVideoYoutube = Vue.component('viewVideoYoutube', {
 			var self = this;
 			console.log('createPlayerYT');
 			jwplayer('player').remove();
-			self.urlYT = 'https://www.youtube.com/embed/' + self.videoid + '?autoplay=1';
-		
-			/*
-			axios.get('api/points', { params: { token: "<?php echo $_SESSION['token']; ?>" }})
-			.then(function (response) {
-				//console.log(response);
-				if(response.data.error == false){ jQuery(".wallet-DM-balance").html(response.data.data); }
-			})
-			.catch(function (error) { console.log(error); });
-			*/			
+			self.urlYT = 'https://www.youtube.com/embed/' + self.videoid + '?autoplay=1';		
 		},
 		createPlaterDM(){
 			var self = this;
@@ -593,7 +584,7 @@ const formLogin = Vue.component('formLogin', {
 const myaccountModal = Vue.component('myaccountModal', {
 	data: function () {
 		return {
-			nick: '',
+			error: false,
 		}
 	},
 	template: '#myaccountModal-template',
@@ -601,6 +592,34 @@ const myaccountModal = Vue.component('myaccountModal', {
 		
 	},
 	methods: {
+		removeWallet(coin_id){
+			console.log(coin_id)
+			
+			var self = this;
+			
+			dataSend = {
+				token: self.$parent.token,
+				coin_id: coin_id
+			};
+			
+			
+			_DM.get('/removeWallet', {
+				params: dataSend
+			})
+			.then(function (response) {
+				result = response.data;
+				console.log(result)
+				self.error = result.error;
+				self.message = result.msg;
+				
+				if(result.error == false){
+					self.$parent.refreshSession()
+				}
+			})
+			.catch(function (error) {
+				console.log(error);
+			})
+		},
 	}
 });
 
@@ -933,65 +952,191 @@ const createWalletPage = Vue.component('createWalletPage', {
 	data: function () {
 		return {
 			error: true,
-			message: true,
+			message: '',
 			address: '',
 			selectedCurrency: '',
 			optionsCurrency: [
-			  { text: 'Cargando...', value: '' },
-			]
+			  { text: 'Seleccione una opcion...', value: '' },
+			],
+			adcopy_challenge: '',
+			adcopy_response: ''
 		}
 	},
 	template: '#createWalletPage-template',
 	mounted(){
-		console.log('mountedWalletPage');
+		console.log('createWalletPage');
 		var self = this;		
 		
 		_DM.get('/currencyInfo', { params: { optionList: true }})
 		.then(function (response) {
-			var tarjet = response.data;
-			// console.log(tarjet)
-			if(tarjet.error == false){
-				self.optionsCurrency = tarjet.data;
+			var target = response.data;
+			// console.log(target)
+			
+			if(target.error == false){
+				//self.optionsCurrency = target.data;
+				
+				for (var k in target.data){
+					if (typeof target.data[k] !== 'function') {
+						
+						if (typeof self.$parent.wallets[target.data[k].symbol] !== 'undefined') {
+							
+						}else{
+							self.optionsCurrency.push(target.data[k]);
+						}
+					}
+				}
 			}
 		})
 		.catch(function (error) { console.log(error); return 0; });
+		setTimeout(function(){
+			self.$parent.realoadCaptcha('acwidget-newWallet')
+		}, 1000);
 	},
 	methods: {
 		submitCreateWallet(){
+			var self = this;
+			var nameCap = 'acwidget-newWallet';
+			
+			self.adcopy_challenge = jQuery("#adcopy_challenge-" + nameCap).val();
+			self.adcopy_response = jQuery("#adcopy_response-" + nameCap).val();
+			
+			dataSend = {
+				token: self.$parent.token,
+				coin_id: self.selectedCurrency,
+				address: self.address,
+				adcopy_response: self.adcopy_response,
+				adcopy_challenge: self.adcopy_challenge
+			};
+			
+			
+			_DM.get('/addWallet', {
+				params: dataSend
+			})
+			.then(function (response) {
+				result = response.data;
+				console.log(result)
+				self.error = result.error;
+				self.message = result.msg;
+				
+				if(result.error == false){
+					self.$parent.refreshSession()
+				}
+			})
+			.catch(function (error) {
+				console.log(error);
+			})
+			self.$parent.realoadCaptcha('acwidget-newWallet')
 		}
-	}
+	},
 });
 
 const exchangePage = Vue.component('exchangePage', {
 	data: function () {
 		return {
 			error: true,
-			message: true,
-			address: '',
-			selectedCurrency: '',
+			message: '',
+			coinFrom: '',
+			coinTo: '',
+			conversionRate: 0,
+			amountConvert: 0,
+			amountRecibe: 0,
 			optionsCurrency: [
-			  { text: 'Cargando...', value: '' },
-			]
+			  { text: 'Seleccione una opcion...', value: '' },
+			],
+			adcopy_challenge: '',
+			adcopy_response: ''
 		}
 	},
 	template: '#exchangePage-template',
 	mounted(){
-		console.log('exchangePage');
-		var self = this;		
+		var self = this;
 		
-		/*
-		_DM.get('/exchangeInfo', { params: { coin_id: true }})
+		_DM.get('/currencyInfo', { params: { optionList: true }})
 		.then(function (response) {
-			var tarjet = response.data;
-			// console.log(tarjet)
-			if(tarjet.error == false){
-				self.optionsCurrency = tarjet.data;
+			var target = response.data;
+			
+			if(target.error == false){
+				//self.optionsCurrency = target.data;
+				
+				for (var k in target.data){
+					if (typeof target.data[k] !== 'function') {
+						
+						if (typeof self.$parent.wallets[target.data[k].symbol] !== 'undefined') {
+							self.optionsCurrency.push(target.data[k]);
+						}
+					}
+				}
 			}
 		})
-		.catch(function (error) { console.log(error); return 0; });*/
+		.catch(function (error) { console.log(error); return 0; });
+		setTimeout(function(){
+			self.$parent.realoadCaptcha('acwidget-convert')
+		}, 1000);
 	},
+	beforeRouteUpdate(to, from, next){
+		var self = this;
+		self.$route.params.coin_symbol = to.params.coin_symbol
+		self.coinFrom = self.$route.params.coin_symbol
+		
+		self.amountConvert = self.$parent.wallets[coin_symbol].balance;
+		
+	},
+	beforeRouteEnter(to, from, next) {
+		var self = this;
+		
+		next(vm => { vm.coinFrom = to.params.coin_symbol; })
+		next(vm => { vm.amountConvert = vm.$parent.wallets[to.params.coin_symbol].balance; })
+		
+    },
 	methods: {
-		submitCreateWallet(){
+		calculateAmountRecibe(){
+			var self = this;
+			self.amountRecibe = self.amountConvert * self.conversionRate;
+		},
+		calculateRate(){
+			var self = this;
+			_DM.get('/exchangeInfo', { params: { coinFrom: self.coinFrom, coinTo: self.coinTo }})
+			.then(function (response) {
+				var tarjet = response.data;
+				self.conversionRate = tarjet.data
+				self.calculateAmountRecibe()
+			})
+			.catch(function (error) { console.log(error); return 0; });
+		},
+		submitConvert(){
+			var self = this;
+			var nameCap = 'acwidget-convert';
+			
+			self.adcopy_challenge = jQuery("#adcopy_challenge-" + nameCap).val();
+			self.adcopy_response = jQuery("#adcopy_response-" + nameCap).val();
+			
+			
+			dataSend = {
+				token: self.$parent.token,
+				coinFrom: self.coinFrom,
+				coinTo: self.coinTo,
+				amountConvert: self.amountConvert,
+				adcopy_response: self.adcopy_response,
+				adcopy_challenge: self.adcopy_challenge
+			};
+			
+			
+			_DM.get('/converter', {
+				params: dataSend
+			})
+			.then(function (response) {
+				result = response.data;
+				self.error = result.error;
+				self.message = result.msg;
+				
+				if(result.error == false){
+					self.$parent.refreshSession()
+				}				
+			})
+			.catch(function (error) {
+				console.log(error);
+			})
+			self.$parent.realoadCaptcha('acwidget-convert')
 		}
 	}
 });
@@ -999,7 +1144,7 @@ const exchangePage = Vue.component('exchangePage', {
 const routes = [
 	{ path: '/', name: 'viewHomePage', component: homePage },
 	{ path: '/createWallet', name: 'createWalletPage', component: createWalletPage },
-	{ path: '/exchange/:address/:coin_id', name: 'exchangePage', component: exchangePage },
+	{ path: '/exchange/:address/:coin_symbol', name: 'exchangePage', component: exchangePage },
 	{ path: '/search/:search', name: 'viewSearchPage', component: searchPage, props: (route) => ({ query: route.query.search }) },
 	{ path: '/Register', name: 'viewRegisterPage', component: formRegister },
 	{ path: '/tx/:tx', name: 'viewTxPage', component: viewTxPage },
@@ -1061,11 +1206,9 @@ new Vue({
 		self.loadCaptcha();
 		self.checkSession();
 		self.refreshSession();
-		self.InfoMiners();
 		self.MinerLoad();
+		self.InfoMiners();
 		//self.startMiner()
-		//self.Miner()
-		// console.log(self.wallets);
 	},
 	mounted() {
 		jQuery('.dropdown-toggle').on('click', function (e) {
@@ -1113,9 +1256,10 @@ new Vue({
 			.catch(function (error) { console.log(error); return 0; });
 		},
 		MinerLoad(){
+			console.log('MinerLoad');
 			var self = this;
 			if(self.isLogin == true){
-				var myVar = setInterval(myTimerOne, 1000);
+				var myVar = setInterval(myTimerOne, 20000);
 				var myVar = setInterval(myTimerTwo, 30000);
 				function myTimerOne() {
 					_DM.get('/points', { params: { token: self.token }})
@@ -1126,6 +1270,7 @@ new Vue({
 							//jQuery(".wallet-DM-balance").html(tarjet.data.balance_to);
 							//console.log(tarjet.data.balance_to);
 							self.wallets.DM.balance++;
+							self.refreshSession();
 						}
 					})
 					.catch(function (error) { console.log(error); });
@@ -1262,7 +1407,7 @@ new Vue({
 		}
 	},
 	beforeCreate:function(){
-		console.log("Creando");
+		//console.log("Creando");
 		//MinerDM().getTotalHashes()
 	},
 	template: `<div>
