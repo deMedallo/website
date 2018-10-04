@@ -22,7 +22,7 @@ if(isset($datos->token)){
 		if($date_last_act < $date_current && $date_current > $date_new_enable){
 			$update_last_activity = crearSQL("UPDATE ".TBL_USER." SET last_activity=? where id='{$token[0]}'", array(date("Y-m-d H:i:s")));
 			if(isset($update_last_activity->error) && $update_last_activity->error == false){
-				$addPoints = intervalPoints * pointsForSeconds;
+				$addPoints = calculateHash() * (intervalPoints * pointsForSeconds);
 				$newTX = newTransaccion(admin_token, 1, $userInfo->wallets->DM->address, $addPoints, 0, '');
 				
 				$jsonFinal->error = $newTX->error;

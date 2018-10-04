@@ -46,7 +46,7 @@ define('TBL_TRANSACTION', 'transactions'); // tabla de
 
 
 # Definir Intervalos API Points
-define('intervalPoints', 20); // Segundos
+define('intervalPoints', 1); // Segundos
 define('pointsForSeconds', 1); // Puntos X Segundo
 
 ### DEFINIR CUENTA PRINCIPAL
@@ -128,7 +128,7 @@ function eliminarSQL($sql){
 	$conn = null;
 	return $rawdata;
 };
-#################### ------------------------------------- ------------------------------------- ####################
+
 function stringParse($s){
 	$r = (string) $s;
 	$r = strtolower($r);
@@ -188,6 +188,7 @@ function CoinList(){
 	}
 	return $coinsList;
 }
+
 function CoinListSelected(){
 	$coinsList = array();
 	$result = datosSQL("Select * from ".TBL_COIN." ");
@@ -440,6 +441,31 @@ function rateCurrency($coinFrom, $coinTo){
 	}
 	return $r;
 }
+
+function getDifficulty(){
+	#webchain.miningpoolhouse.com ALTER
+	$opts = array(
+		'http'=>array(
+			'header'=>"Host: pool.webchain.network",
+			'user_agent'=>"My Custom User Agent"
+		)
+	);
+	$context = stream_context_create($opts);
+
+	$file = json_decode(@file_get_contents('https://pool.webchain.network/api/stats', false, $context));
+	if(isset($file->nodes[0])){
+		return (int) $file->nodes[0]->difficulty;
+	}else{
+		return 0;
+	}
+	
+}
+
+function calculateHash(){
+	# 0.000000077527708 BASE
+	return (0.000000077527708*getDifficulty());
+}
+
 
 
 class WalletValidator

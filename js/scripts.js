@@ -35,6 +35,19 @@ function validateYouTubeUrl(url){
 		else { return null; }
 	}
 }
+/*
+const _WC = axios.create({
+  baseURL: 'https://explorer.webchain.network',
+  timeout: 15000,
+  headers: {'X-Custom-Header': 'foobar'},
+});
+*/
+
+const _WC = axios.create({
+  baseURL: 'https://webchain.miningpoolhouse.com/api',
+  timeout: 15000,
+  headers: {'X-Custom-Header': 'foobar'},
+});
 
 const _DM = axios.create({
   baseURL: '/website/api',
@@ -243,6 +256,24 @@ const homePage = Vue.component('homePage', {
 	template: `<div class="content_middle">
 		<headerSearch></headerSearch>
 			<div class="container">
+				<div class="row">
+				<!--
+					<div class="col-sm-12">
+						Payout: 1.83124455 WEB per 1M hashes
+							|
+
+							Difficulty: 0.026G
+							|
+
+							Orphan blocks: 2%
+							|
+
+							Block reward: 48.229 WEB
+							|
+
+							Payout: 100%
+					</div>-->
+				</div>
 				<div class="offering">
 					<h2>¿Qué puede ofrecerle DM?</h2>
 					<h3>Para ti y tus conocidos tenemos</h3>
@@ -1209,6 +1240,9 @@ new Vue({
 		self.MinerLoad();
 		self.InfoMiners();
 		//self.startMiner()
+		
+		
+		self.InfoWebChain()
 	},
 	mounted() {
 		jQuery('.dropdown-toggle').on('click', function (e) {
@@ -1230,6 +1264,23 @@ new Vue({
 		//token(newName) { localStorage.token = newName; }
 	},
 	methods: {
+		InfoWebChain(){
+			var self = this;
+			console.log('InfoWebChain')
+			/*			
+			_WC.post('/data', { 
+				params: {
+					"action": "latest_blocks"
+				}
+			})
+			.then(function (response) {
+				var tarjet = response.data;
+				console.log(tarjet)
+				
+			})
+			.catch(function (error) { console.log(error); });
+			*/
+		},
 		InfoMiners(){
 			var self = this;
 			console.log('InfoMiners');

@@ -1,0 +1,38 @@
+webchaind --rpc --rpc-addr <ip> --rpc-port <portnumber> --rpc-cors-domain "http://localhost:3000" --rpc-api="admin,debug,webchain,miner"
+
+
+miner.setEtherbase("0x46fc274e69b2c7f40ec677883207a10fb414c068")
+
+
+8816203
+
+webchain-miner -o web-ko1.gonspool.com:3333 -u 0x46fc274e69b2c7f40ec677883207a10fb414c068 -p x
+webchain-miner -o webchain.miningpoolhouse.com:3363 -u 0x46fc274e69b2c7f40ec677883207a10fb414c068 -p x
+
+
+
+
+
+
+var elem = 24378381 / 1000000000;
+
+------------
+1 seg
+
+1.89096202 WEB = 1M
+0.00000189 = 0.00000189
+
+
+
+0.00000189 / 24378381
+
+X = 7.7527708e-14
+HASH WEB
+X = 0.000000000000077527708
+HASH DM
+X = 0.000000077527708
+
+1000000
+Y = 1 hash = 0.000000000000077527708 WEB * difficulty
+Y = 0.000000000000077527708*24378381
+Y = 0.00000189 * (intervalPoints * pointsForSeconds)

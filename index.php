@@ -30,6 +30,7 @@
 		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 		
 		<!--<script type="text/javascript" src="http://api.solvemedia.com/papi/challenge.ajax"></script>-->
+		
 	</head>
 	<body>
 		<div id="app"></div>
