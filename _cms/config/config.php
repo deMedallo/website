@@ -46,7 +46,7 @@ define('TBL_TRANSACTION', 'transactions'); // tabla de
 
 
 # Definir Intervalos API Points
-define('intervalPoints', 1); // Segundos
+define('intervalPoints', 20); // Segundos
 define('pointsForSeconds', 1); // Puntos X Segundo
 
 ### DEFINIR CUENTA PRINCIPAL
